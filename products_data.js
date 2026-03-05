@@ -1,98 +1,21 @@
 const productsData = [
-    {
-        id: 1,
-        name: "Stílusos Kabát 1",
-        price: 15990,
-        image: "jacket1.jpg",
-        category_id: 1,
-        description: "Prémium minőségű téli kabát, elegáns megjelenéssel."
-    },
-    {
-        id: 2,
-        name: "Stílusos Kabát 2",
-        price: 18500,
-        image: "jacket2.jpg",
-        category_id: 1,
-        description: "Vízlepergető anyagból készült modern kabát."
-    },
-    {
-        id: 3,
-        name: "Stílusos Kabát 3",
-        price: 12900,
-        image: "jacket3.jpg",
-        category_id: 1,
-        description: "Könnyű átmeneti kabát minden alkalomra."
-    },
-    {
-        id: 4,
-        name: "Kényelmes Nadrág 1",
-        price: 8990,
-        image: "pants1.jpg",
-        category_id: 2,
-        description: "Rugalmas pamutvászon nadrág a mindennapokra."
-    },
-    {
-        id: 5,
-        name: "Kényelmes Nadrág 2",
-        price: 9500,
-        image: "pants2.jpg",
-        category_id: 2,
-        description: "Elegáns farmernadrág, tartós kialakítással."
-    },
-    {
-        id: 6,
-        name: "Kényelmes Nadrág 3",
-        price: 7900,
-        image: "pants3.jpg",
-        category_id: 2,
-        description: "Slim fit stílusú nadrág szürke színben."
-    },
-    {
-        id: 7,
-        name: "Divatos Ing 1",
-        price: 6500,
-        image: "shirt1.jpg",
-        category_id: 3,
-        description: "Fehér üzleti ing, vasaláskönnyített anyagból."
-    },
-    {
-        id: 8,
-        name: "Divatos Ing 2",
-        price: 7200,
-        image: "shirt2.jpg",
-        category_id: 3,
-        description: "Kockás flanel ing a lazább napokra."
-    },
-    {
-        id: 9,
-        name: "Divatos Ing 3",
-        price: 5900,
-        image: "shirt3.jpg",
-        category_id: 3,
-        description: "Sötétkék alkalmi ing."
-    },
-    {
-        id: 10,
-        name: "Sportos Cipő 1",
-        price: 22900,
-        image: "shoes1.jpg",
-        category_id: 4,
-        description: "Ultrakönnyű futócipő maximális kényelemmel."
-    },
-    {
-        id: 11,
-        name: "Sportos Cipő 2",
-        price: 25500,
-        image: "shoes2.jpg",
-        category_id: 4,
-        description: "Bőr sportcipő, strapabíró talppal."
-    },
-    {
-        id: 12,
-        name: "Sportos Cipő 3",
-        price: 19900,
-        image: "shoes3.jpg",
-        category_id: 4,
-        description: "Modern utcai sneaker."
-    }
+    // Ingek (Category 1)
+    { id: 1, name: "Fehér elegáns ing", price: 8990, image: "shirt1.jpg", category_id: 1, description: "Prémium minőségű pamut ing, alkalmi és hétköznapi viseletre is." },
+    { id: 2, name: "Kék lezser ing", price: 7990, image: "shirt2.jpg", category_id: 1, description: "Kényelmes viselet, ideális hétvégi programokhoz." },
+    { id: 3, name: "Kockás flanel ing", price: 9990, image: "shirt3.jpg", category_id: 1, description: "Meleg és stílusos, tökéletes választás hűvösebb napokra." },
+
+    // Zakók (Category 2)
+    { id: 4, name: "Fekete zakó", price: 24990, image: "jacket1.jpg", category_id: 2, description: "Modern szabású, karcsúsított zakó elegáns eseményekre." },
+    { id: 5, name: "Szürke sportzakó", price: 21990, image: "jacket2.jpg", category_id: 2, description: "Elegáns, mégis könnyed megjelenést biztosít." },
+    { id: 6, name: "Sötétkék blézer", price: 26990, image: "jacket3.jpg", category_id: 2, description: "Klasszikus darab, amely minden ruhatár alapja." },
+
+    // Nadrágok (Category 3)
+    { id: 7, name: "Kék farmer nadrág", price: 12990, image: "pants1.jpg", category_id: 3, description: "Kényelmes, strapabíró farmer nadrág mindennapi használatra." },
+    { id: 8, name: "Bézs chino nadrág", price: 11990, image: "pants2.jpg", category_id: 3, description: "Elegáns és kényelmes, tökéletes irodai viselet." },
+    { id: 9, name: "Fekete szövetnadrág", price: 14990, image: "pants3.jpg", category_id: 3, description: "Hivatalos eseményekre ajánlott, prémium anyagból." },
+
+    // Cipők (Category 4)
+    { id: 10, name: "Férfi bőr cipő", price: 19990, image: "shoes1.jpg", category_id: 4, description: "Valódi bőrből készült, kényelmes talpbetéttel rendelkező cipő." },
+    { id: 11, name: "Fehér sportcipő", price: 15990, image: "shoes2.jpg", category_id: 4, description: "Trendi és kényelmes, mindennapi rohangáláshoz." },
+    { id: 12, name: "Futócipő", price: 18990, image: "shoes3.jpg", category_id: 4, description: "Könnyű szerkezet, kiváló ütéscsillapítás sportoláshoz." }
 ];
