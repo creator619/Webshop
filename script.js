@@ -1,4 +1,5 @@
-const API_URL = "../backend"; // Backend URL-je, szükség szerint módosítható
+// Adatok kezelése szerver nélkül (localStorage-ban)
+// A termékek a products_data.js fájlból jönnek
 
 // Segédfüggvény a termékek megjelenítéséhez
 function renderProducts(list) {
@@ -18,20 +19,11 @@ function renderProducts(list) {
     });
 }
 
-// Termékek lekérése backendről
-async function fetchProducts() {
-    try {
-        const response = await fetch(`${API_URL}/products`);
-        const products = await response.json();
-
-        // Termékek mentése globálisan a szűréshez
-        window.allProducts = products;
-
-        renderProducts(products);
-    } catch (error) {
-        console.error("Hiba a termékek betöltésekor:", error);
-        alert("Nem sikerült betölteni a termékeket! Lehet, hogy a szerver nem elérhető.");
-    }
+// Termékek lekérése a products_data.js-ből
+function fetchProducts() {
+    // Termékek mentése globálisan a szűréshez
+    window.allProducts = productsData;
+    renderProducts(productsData);
 }
 
 // Csak akkor hívjuk meg, ha a főoldalon vagyunk
@@ -50,7 +42,6 @@ document.querySelectorAll(".menu li").forEach(item => {
             const filtered = window.allProducts.filter(p => p.category_id == cat);
             renderProducts(filtered);
         } else if (item.innerText.includes("Főoldal")) {
-            // Ha már ott vagyunk, reset
             renderProducts(window.allProducts);
         }
     });
@@ -58,10 +49,6 @@ document.querySelectorAll(".menu li").forEach(item => {
 
 
 function openProduct(id) {
-    // Ha van betöltve terméklista, keressük abban, ha nincs, fetch-elni kéne, 
-    // de egyszerűbb ha az ID-t visszük át URL paraméterben vagy localStorage-ban mentjük a kiválasztottat.
-    // A mostani logikád localStorage-t használ, tartsuk meg, de fetch-ből nyerjük ki.
-
     const product = window.allProducts.find(p => p.id === id);
     localStorage.setItem("selectedProduct", JSON.stringify(product));
     window.location.href = "product.html";
@@ -90,7 +77,6 @@ function updateCartCount() {
     }
 }
 
-// Oldal betöltésekor frissítjük a számlálót
 updateCartCount();
 
 function addToCart(product) {
@@ -111,13 +97,12 @@ if (window.location.pathname.includes("product.html")) {
     }
 }
 
-// Kosár oldal betöltése
 if (window.location.pathname.includes("cart.html")) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     const container = document.getElementById("cart-items");
     let total = 0;
 
-    container.innerHTML = ""; // Törlés újrarajzolás előtt
+    container.innerHTML = "";
 
     if (cart.length === 0) {
         container.innerHTML = "<p>A kosár üres.</p>";
@@ -140,7 +125,6 @@ if (window.location.pathname.includes("cart.html")) {
 
     document.getElementById("cart-total").textContent = total.toLocaleString() + " Ft";
 
-    // Tovább a rendeléshez gomb
     const checkoutBtn = document.querySelector(".checkout-btn");
     if (checkoutBtn) {
         checkoutBtn.addEventListener("click", () => {
@@ -153,7 +137,6 @@ if (window.location.pathname.includes("cart.html")) {
     }
 }
 
-// Termék törlése a kosárból
 function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     cart.splice(index, 1);
@@ -183,7 +166,6 @@ if (window.location.pathname.includes("checkout.html")) {
 
     document.getElementById("checkout-total").textContent = total.toLocaleString() + " Ft";
 
-    // Rendelés leadása
     const orderBtn = document.querySelector(".place-order-btn");
     if (orderBtn) {
         orderBtn.addEventListener("click", () => {
@@ -196,89 +178,70 @@ if (window.location.pathname.includes("checkout.html")) {
                 return;
             }
 
-            // Rendelés küldése a backendnek
-            fetch(`${API_URL}/orders`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    user_email: email, // Most csak az emailt küldjük vendégként
-                    items: cart,
-                    total_price: total
-                })
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert("Rendelés sikeresen leadva!");
-                        localStorage.removeItem("cart");
-                        window.location.href = "index.html";
-                    } else {
-                        alert("Hiba a rendelés leadásakor!");
-                    }
-                })
-                .catch(err => {
-                    console.error("Hiba:", err);
-                    alert("Szerver hiba történt!");
-                });
+            // Rendelés mentése localStorage-ba (szerver helyett)
+            let orders = JSON.parse(localStorage.getItem("orders")) || [];
+            orders.push({
+                id: Date.now(),
+                user_name: name,
+                user_email: email,
+                address: address,
+                items: cart,
+                total_price: total,
+                date: new Date().toISOString()
+            });
+            localStorage.setItem("orders", JSON.stringify(orders));
+
+            alert("Rendelés sikeresen leadva!");
+            localStorage.removeItem("cart");
+            window.location.href = "index.html";
         });
     }
 }
 
 
-// --- BACKEND AUTH (Regisztráció / Login) ---
+// --- AUTH (Regisztráció / Login) ---
 // Regisztráció
 if (window.location.pathname.includes("register.html")) {
-    document.getElementById("register-btn").addEventListener("click", async () => {
+    document.getElementById("register-btn").addEventListener("click", () => {
         const name = document.getElementById("reg-name").value;
         const email = document.getElementById("reg-email").value;
         const password = document.getElementById("reg-password").value;
 
-        try {
-            const response = await fetch(`${API_URL}/auth/register`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, password })
-            });
-
-            const data = await response.json();
-            alert(data.message);
-
-            if (response.ok) {
-                window.location.href = "login.html";
-            }
-        } catch (error) {
-            console.error("Hiba:", error);
-            alert("Szerver hiba történt!");
+        if (!name || !email || !password) {
+            alert("Kérlek tölts ki minden mezőt!");
+            return;
         }
+
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        if (users.find(u => u.email === email)) {
+            alert("Ez az email cím már regisztrálva van!");
+            return;
+        }
+
+        users.push({ name, email, password });
+        localStorage.setItem("users", JSON.stringify(users));
+
+        alert("Regisztráció sikeres!");
+        window.location.href = "login.html";
     });
 }
 
 
 // Bejelentkezés
 if (window.location.pathname.includes("login.html")) {
-    document.getElementById("login-btn").addEventListener("click", async () => {
+    document.getElementById("login-btn").addEventListener("click", () => {
         const email = document.getElementById("login-email").value;
         const password = document.getElementById("login-password").value;
 
-        try {
-            const response = await fetch(`${API_URL}/auth/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
-            });
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        const user = users.find(u => u.email === email && u.password === password);
 
-            const data = await response.json();
-            alert(data.message);
-
-            if (response.ok) {
-                // Token és user mentése
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("user", JSON.stringify(data.user));
-
-                window.location.href = "index.html";
-            }
-        } catch (error) {
-            console.error("Hiba:", error);
-            alert("Szerver hiba történt!");
+        if (user) {
+            localStorage.setItem("user", JSON.stringify(user));
+            alert("Sikeres bejelentkezés!");
+            window.location.href = "index.html";
+        } else {
+            alert("Hibás email vagy jelszó!");
         }
     });
 }
