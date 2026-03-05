@@ -57,7 +57,15 @@ function openProduct(id) {
 
 // --- TERMÉK OLDAL ---
 if (window.location.pathname.includes("product.html")) {
-    const product = JSON.parse(localStorage.getItem("selectedProduct"));
+    let product = JSON.parse(localStorage.getItem("selectedProduct"));
+
+    // Frissítsük a termék adatait a productsData-ból, hogy biztosan meglegyenek a méretek
+    if (product && typeof productsData !== 'undefined') {
+        const freshProduct = productsData.find(p => p.id === product.id);
+        if (freshProduct) {
+            product = freshProduct;
+        }
+    }
 
     if (product) {
         document.getElementById("product-img").src = product.image;
