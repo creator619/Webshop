@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rendelés</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class="menu">
+        <ul>
+            <li onclick="window.location.href='index.html'">Főoldal</li>
+            <li onclick="window.location.href='cart.html'">Kosár</li>
+        </ul>
+    </nav>
+
+    <main class="checkout-page">
+        <h1>Rendelés véglegesítése</h1>
+
+        <div class="checkout-container">
+
+            <div class="checkout-form">
+                <h2>Szállítási adatok</h2>
+
+                <label>Név</label>
+                <input type="text" id="name">
+
+                <label>E-mail</label>
+                <input type="email" id="email">
+
+                <label>Cím</label>
+                <input type="text" id="address">
+
+                <button class="place-order-btn">Rendelés leadása</button>
+            </div>
+
+            <div class="checkout-summary">
+                <h2>Rendelés összegzése</h2>
+                <div id="checkout-items"></div>
+
+                <h3>Végösszeg: <span id="checkout-total">0 Ft</span></h3>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="shipping-banner">
+        <span>🚚 10.000 Ft felett <strong>INGYENES</strong> a szállítás!</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
