@@ -247,8 +247,46 @@ button {
 .description {
     font-size: 1.1rem;
     line-height: 1.8;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     color: #666;
+}
+
+.size-selection {
+    margin-bottom: 30px;
+}
+
+.size-selection h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.size-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.size-btn {
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 700;
+    border-radius: 4px;
+}
+
+.size-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.size-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
 }
 
 .add-to-cart {

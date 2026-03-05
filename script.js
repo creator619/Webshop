@@ -64,6 +64,23 @@ if (window.location.pathname.includes("product.html")) {
         document.getElementById("product-name").textContent = product.name;
         document.getElementById("product-price").textContent = product.price.toLocaleString() + " Ft";
         document.getElementById("product-desc").textContent = product.description;
+
+        // Méretek megjelenítése
+        const sizeContainer = document.getElementById("size-options");
+        if (sizeContainer && product.sizes) {
+            sizeContainer.innerHTML = "";
+            product.sizes.forEach(size => {
+                const btn = document.createElement("button");
+                btn.className = "size-btn";
+                btn.textContent = size;
+                btn.onclick = () => {
+                    document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    window.selectedSize = size;
+                };
+                sizeContainer.appendChild(btn);
+            });
+        }
     }
 }
 
@@ -92,7 +109,12 @@ if (window.location.pathname.includes("product.html")) {
     if (addToCartBtn) {
         addToCartBtn.addEventListener("click", () => {
             const product = JSON.parse(localStorage.getItem("selectedProduct"));
-            addToCart(product);
+            if (!window.selectedSize) {
+                alert("Kérlek válassz méretet!");
+                return;
+            }
+            const productWithSize = { ...product, size: window.selectedSize };
+            addToCart(productWithSize);
         });
     }
 }
@@ -114,7 +136,7 @@ if (window.location.pathname.includes("cart.html")) {
                 <div class="cart-item">
                     <img src="${item.image}">
                     <div>
-                        <h3>${item.name}</h3>
+                        <h3>${item.name} ${item.size ? `(${item.size})` : ''}</h3>
                         <p>${item.price.toLocaleString()} Ft</p>
                     </div>
                     <button class="remove-btn" onclick="removeItem(${index})">Törlés</button>
@@ -158,7 +180,7 @@ if (window.location.pathname.includes("checkout.html")) {
 
         container.innerHTML += `
             <div class="checkout-item">
-                <span>${item.name}</span>
+                <span>${item.name} ${item.size ? `(${item.size})` : ''}</span>
                 <span>${item.price.toLocaleString()} Ft</span>
             </div>
         `;
