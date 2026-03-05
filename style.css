@@ -33,7 +33,10 @@ h3 {
 
 /* Hero kép */
 .hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('hatter.jpg') center/cover no-repeat;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('hatter.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     height: 70vh;
     display: flex;
     align-items: center;
@@ -350,7 +353,6 @@ button {
     padding: 30px;
     border-radius: 8px;
     box-shadow: var(--shadow);
-    display: inline-block;
     float: right;
     width: 100%;
     max-width: 400px;
