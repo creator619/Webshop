@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000";
+const API_URL = "../backend"; // Backend URL-je, szükség szerint módosítható
 
 // Segédfüggvény a termékek megjelenítéséhez
 function renderProducts(list) {
