@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruházati Webshop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="hero">
+        <div class="hero-text">
+            <h1>Férfi Elegancia</h1>
+            <p>Prémium minőségű ingek, zakók, nadrágok és cipők.</p>
+        </div>
+    </header>
+
+    <nav class="menu">
+        <ul>
+            <li data-category="1">Ing</li>
+            <li data-category="2">Zakó</li>
+            <li data-category="3">Nadrág</li>
+            <li data-category="4">Cipő</li>
+            <li onclick="window.location.href='cart.html'" class="cart-menu">
+                Kosár <span id="cart-count">(0)</span>
+            </li>
+            <li onclick="window.location.href='login.html'">Bejelentkezés</li>
+            <li onclick="window.location.href='register.html'">Regisztráció</li>
+        </ul>
+    </nav>
+
+    <main>
+        <h2 class="section-title">Termékek</h2>
+        <div id="product-list" class="products"></div>
+    </main>
+
+    <div class="shipping-banner">
+        <span>🚚 10.000 Ft felett <strong>INGYENES</strong> a szállítás!</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
