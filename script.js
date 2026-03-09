@@ -1,5 +1,78 @@
-// Adatok kezelése szerver nélkül (localStorage-ban)
-// A termékek a products_data.js fájlból jönnek
+// --- SEGÉDFÜGGVÉNYEK ---
+
+// Toast értesítés megjelenítése
+function showToast(message) {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerHTML = `<span>✨</span> ${message}`;
+
+    container.appendChild(toast);
+
+    // Eltüntetés 3 másodperc után
+    setTimeout(() => {
+        toast.classList.add("hide");
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+
+// Felhasználói állapot ellenőrzése és menü frissítése
+function updateAuthUI() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userNav = document.getElementById("user-nav");
+
+    if (user && userNav) {
+        userNav.innerHTML = `
+            <li class="user-status">
+                👤 ${user.name}
+                <a href="#" class="logout-link" onclick="logout()">Kijelentkezés</a>
+            </li>
+        `;
+    }
+}
+
+function logout() {
+    localStorage.removeItem("user");
+    showToast("Sikeres kijelentkezés!");
+    setTimeout(() => {
+        window.location.href = "index.html";
+    }, 1000);
+}
+
+// Funkciók inicializálása
+document.addEventListener("DOMContentLoaded", () => {
+    updateAuthUI();
+
+    // Mobil menü kapcsoló
+    const toggleBtn = document.getElementById("mobile-menu-toggle");
+    const menu = document.getElementById("main-menu");
+    if (toggleBtn && menu) {
+        toggleBtn.addEventListener("click", () => {
+            menu.classList.toggle("active");
+            toggleBtn.textContent = menu.classList.contains("active") ? "✕" : "☰";
+        });
+    }
+
+    // Keresés funkció
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            const term = e.target.value.toLowerCase();
+            if (!window.allProducts) return;
+
+            const filtered = window.allProducts.filter(p =>
+                p.name.toLowerCase().includes(term) ||
+                p.description.toLowerCase().includes(term)
+            );
+            renderProducts(filtered);
+        });
+    }
+});
+
 
 // Segédfüggvény a termékek megjelenítéséhez
 function renderProducts(list) {
@@ -7,6 +80,11 @@ function renderProducts(list) {
     if (!container) return; // Ha nem a főoldalon vagyunk
 
     container.innerHTML = "";
+
+    if (list.length === 0) {
+        container.innerHTML = "<p style='grid-column: 1/-1; text-align: center; padding: 50px;'>Nincs találat a keresésre.</p>";
+        return;
+    }
 
     list.forEach(p => {
         container.innerHTML += `
@@ -41,6 +119,9 @@ document.querySelectorAll(".menu li").forEach(item => {
         if (cat) {
             const filtered = window.allProducts.filter(p => p.category_id == cat);
             renderProducts(filtered);
+            // Mobil menü bezárása kattintás után
+            const menu = document.getElementById("main-menu");
+            if (menu) menu.classList.remove("active");
         } else if (item.innerText.includes("Főoldal")) {
             renderProducts(window.allProducts);
         }
@@ -108,7 +189,7 @@ function addToCart(product) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     cart.push(product);
     localStorage.setItem("cart", JSON.stringify(cart));
-    alert("Hozzáadva a kosárhoz!");
+    showToast("Hozzáadva a kosárhoz!");
     updateCartCount();
 }
 
@@ -118,7 +199,7 @@ if (window.location.pathname.includes("product.html")) {
         addToCartBtn.addEventListener("click", () => {
             const product = JSON.parse(localStorage.getItem("selectedProduct"));
             if (!window.selectedSize) {
-                alert("Kérlek válassz méretet!");
+                showToast("Kérlek válassz méretet!");
                 return;
             }
             const productWithSize = { ...product, size: window.selectedSize };
@@ -159,7 +240,7 @@ if (window.location.pathname.includes("cart.html")) {
     if (checkoutBtn) {
         checkoutBtn.addEventListener("click", () => {
             if (cart.length === 0) {
-                alert("A kosár üres!");
+                showToast("A kosár üres!");
                 return;
             }
             window.location.href = "checkout.html";
@@ -204,7 +285,7 @@ if (window.location.pathname.includes("checkout.html")) {
             const address = document.getElementById("address").value;
 
             if (!name || !email || !address) {
-                alert("Kérlek tölts ki minden mezőt!");
+                showToast("Kérlek tölts ki minden mezőt!");
                 return;
             }
 
@@ -221,9 +302,11 @@ if (window.location.pathname.includes("checkout.html")) {
             });
             localStorage.setItem("orders", JSON.stringify(orders));
 
-            alert("Rendelés sikeresen leadva!");
+            showToast("Rendelés sikeresen leadva!");
             localStorage.removeItem("cart");
-            window.location.href = "index.html";
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1500);
         });
     }
 }
@@ -238,21 +321,23 @@ if (window.location.pathname.includes("register.html")) {
         const password = document.getElementById("reg-password").value;
 
         if (!name || !email || !password) {
-            alert("Kérlek tölts ki minden mezőt!");
+            showToast("Kérlek tölts ki minden mezőt!");
             return;
         }
 
         let users = JSON.parse(localStorage.getItem("users")) || [];
         if (users.find(u => u.email === email)) {
-            alert("Ez az email cím már regisztrálva van!");
+            showToast("Ez az email cím már regisztrálva van!");
             return;
         }
 
         users.push({ name, email, password });
         localStorage.setItem("users", JSON.stringify(users));
 
-        alert("Regisztráció sikeres!");
-        window.location.href = "login.html";
+        showToast("Regisztráció sikeres!");
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1500);
     });
 }
 
@@ -268,10 +353,12 @@ if (window.location.pathname.includes("login.html")) {
 
         if (user) {
             localStorage.setItem("user", JSON.stringify(user));
-            alert("Sikeres bejelentkezés!");
-            window.location.href = "index.html";
+            showToast("Sikeres bejelentkezés!");
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1000);
         } else {
-            alert("Hibás email vagy jelszó!");
+            showToast("Hibás email vagy jelszó!");
         }
     });
 }

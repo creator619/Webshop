@@ -11,11 +11,13 @@
 <body>
 
     <nav class="menu">
-        <ul>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">☰</button>
+        <ul id="main-menu">
             <li onclick="window.location.href='index.html'">Főoldal</li>
             <li onclick="window.location.href='cart.html'" class="cart-menu">
                 Kosár <span id="cart-count">(0)</span>
             </li>
+            <div id="user-nav" class="user-status"></div>
         </ul>
     </nav>
 
@@ -78,6 +80,8 @@
             <p>&copy; 2024 Ruházati Webshop - Minden jog fenntartva.</p>
         </div>
     </footer>
+
+    <div id="toast-container" class="toast-container"></div>
 
     <script src="products_data.js?v=1.1"></script>
     <script src="script.js?v=1.1"></script>
