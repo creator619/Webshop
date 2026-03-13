@@ -277,14 +277,24 @@ if (window.location.pathname.includes("checkout.html")) {
 
     document.getElementById("checkout-total").textContent = total.toLocaleString() + " Ft";
 
+    // Felhasználói adatok automatikus kitöltése, ha be van jelentkezve
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+        if (document.getElementById("name")) document.getElementById("name").value = user.name;
+        if (document.getElementById("email")) document.getElementById("email").value = user.email;
+    }
+
     const orderBtn = document.querySelector(".place-order-btn");
     if (orderBtn) {
         orderBtn.addEventListener("click", () => {
             const name = document.getElementById("name").value;
             const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
             const address = document.getElementById("address").value;
+            const shippingMethod = document.querySelector('input[name="shipping"]:checked').value;
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
 
-            if (!name || !email || !address) {
+            if (!name || !email || !phone || !address) {
                 showToast("Kérlek tölts ki minden mezőt!");
                 return;
             }
@@ -295,7 +305,10 @@ if (window.location.pathname.includes("checkout.html")) {
                 id: Date.now(),
                 user_name: name,
                 user_email: email,
+                user_phone: phone,
                 address: address,
+                shipping_method: shippingMethod,
+                payment_method: paymentMethod,
                 items: cart,
                 total_price: total,
                 date: new Date().toISOString()

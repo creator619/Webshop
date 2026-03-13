@@ -27,14 +27,49 @@
             <div class="checkout-form">
                 <h2>Szállítási adatok</h2>
 
-                <label>Név</label>
-                <input type="text" id="name">
+                <label for="name">Név</label>
+                <input type="text" id="name" placeholder="Teljes név">
 
-                <label>E-mail</label>
-                <input type="email" id="email">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" placeholder="pelda@email.hu">
 
-                <label>Cím</label>
-                <input type="text" id="address">
+                <label for="phone">Telefonszám</label>
+                <input type="tel" id="phone" placeholder="+36 30 123 4567">
+
+                <label for="address">Szállítási cím</label>
+                <input type="text" id="address" placeholder="Város, utca, házszám">
+
+                <div class="checkout-section">
+                    <h3>Szállítási mód</h3>
+                    <div class="radio-group">
+                        <label class="radio-container">
+                            <input type="radio" name="shipping" value="home" checked>
+                            <span class="checkmark"></span>
+                            Házhoz szállítás (1.500 Ft)
+                        </label>
+                        <label class="radio-container">
+                            <input type="radio" name="shipping" value="locker">
+                            <span class="checkmark"></span>
+                            Csomagautomata (990 Ft)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="checkout-section">
+                    <h3>Fizetési mód</h3>
+                    <div class="radio-group">
+                        <label class="radio-container">
+                            <input type="radio" name="payment" value="cod" checked>
+                            <span class="checkmark"></span>
+                            Utánvétel
+                        </label>
+                        <label class="radio-container">
+                            <input type="radio" name="payment" value="transfer">
+                            <span class="checkmark"></span>
+                            Banki átutalás
+                        </label>
+                    </div>
+                </div>
 
                 <button class="place-order-btn">Rendelés leadása</button>
             </div>

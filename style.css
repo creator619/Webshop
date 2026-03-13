@@ -884,3 +884,106 @@ button {
     font-weight: 700;
     margin-left: 5px;
 }
+
+/* --- CHECKOUT FORM ENHANCEMENTS --- */
+.checkout-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.checkout-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: var(--primary);
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.radio-container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    cursor: pointer;
+    font-size: 1rem;
+    user-select: none;
+    transition: var(--transition);
+    color: #555;
+}
+
+.radio-container:hover {
+    color: var(--primary);
+}
+
+.radio-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    height: 22px;
+    width: 22px;
+    background-color: #eee;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.radio-container:hover input~.checkmark {
+    background-color: #e0e0e0;
+}
+
+.radio-container input:checked~.checkmark {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.radio-container input:checked~.checkmark:after {
+    display: block;
+}
+
+.radio-container .checkmark:after {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+}
+
+.checkout-form input[type="text"],
+.checkout-form input[type="email"],
+.checkout-form input[type="tel"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+    transition: var(--transition);
+}
+
+.checkout-form input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
