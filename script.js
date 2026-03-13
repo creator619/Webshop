@@ -27,9 +27,9 @@ function updateAuthUI() {
 
     if (user && userNav) {
         userNav.innerHTML = `
-            <li class="user-status">
-                👤 ${user.name}
-                <a href="#" class="logout-link" onclick="logout()">Kijelentkezés</a>
+            <li class="user-info">
+                <span class="username">👤 ${user.name}</span>
+                <button class="logout-btn" onclick="logout()">Kijelentkezés</button>
             </li>
         `;
     }

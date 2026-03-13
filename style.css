@@ -844,19 +844,37 @@ button {
 }
 
 /* Felhasználói állapot a menüben */
-.user-status {
+.user-info {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: var(--primary);
-    font-weight: 700;
+    gap: 15px;
+    padding: 0 15px;
 }
 
-.logout-link {
+.username {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.95rem;
+}
+
+.logout-btn {
+    background: transparent;
+    color: #ff4444;
+    border: 1px solid #ff4444;
+    padding: 6px 12px;
+    border-radius: 4px;
     font-size: 0.8rem;
-    color: #ff4444 !important;
-    text-transform: none;
-    letter-spacing: 0;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.logout-btn:hover {
+    background: #ff4444;
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.2);
 }
 
 /* UI Polishing & Animations */
