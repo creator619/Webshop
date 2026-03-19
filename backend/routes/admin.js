@@ -11,9 +11,30 @@ const sqlite3 = require('sqlite3').verbose();
 const authMiddleware = require("../Middleware/authMiddleware");
 const adminMiddleware = require("../Middleware/adminMiddleware");
 
+// törölni 
+
+// Összekötni a product adatokat a backendel, hogy az admin tudja szerkezteni akár az ár értékét
+// 4 plusz oldalt megcsinálni ami lent van
+// Admin fült befejezni funkciókkal ellátni
+// Akár akció funkció hozzáadása
+
+
+// Token rendszer müködésbe hozása (Ehhez kell, hogy a frontend is hostolva legyen)
+// maradék oldalak megcsinálása
+// profil oldal megcsinálása
 
 
 // Nekem testek törölhetőek, ha kell maradhat
+
+router.get("/useradat", authMiddleware, (req, res) => {
+    db.all("SELECT * FROM users", [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
 
 router.get("/test", authMiddleware, adminMiddleware, (req, res) => {
     db.all("SELECT * FROM products", [], (err, rows) => {
@@ -45,10 +66,79 @@ router.post("/test1", authMiddleware, (req, res) => {
 });
 
 
+// Rendelés tábla lekérdezése
+
+router.get("/orders/", (req, res) => {
+
+    db.all("SELECT * FROM orders", [], (err, rows) => {
+
+        if (err) {
+            res.status(500).json({ error: err.message})
+        }
+        res.json(rows);
+    });
+});
+
+
+// Rendelés frissítése
+
+router.put("/orders/:id", (req, res) => {
+    const { id } = req.params;
+    const { user_email, total_price, status, created_at } = req.body;
+
+    const sql = `
+        UPDATE orders
+        SET user_email = ?, total_price = ?, status = ?, created_at = ?
+        WHERE id = ?
+    `;    
+    db.run(sql, [user_email, total_price, status, created_at , id], function(err) {
+
+        if (err) {
+            return res.status(500).json({ message:"Adatbázis hiba" });
+        }
+        if (this.changes === 0) {
+
+            return res.status(404).json({
+                message: "Azonosítóval nem található termék!"
+            });
+        }
+        res.json({
+            message: "Rendelés adatai frissítve!"
+        });
+    });
+});
+
+// rendelés törlése
+
+router.delete("/orders/:id", (req, res) => {
+
+    const { id } = req.params;
+    
+    const sql = `
+        DELETE FROM orders WHERE id = ?
+    `;
+
+    db.run(sql, [id], function(err) {
+    
+        if (err) {
+            return res.status(500).json({ message:"Adatbázis hiba" });
+        }
+        if (this.changes === 0) {
+
+            return res.status(404).json({
+                message: "Azonosítóval nem található termék!"
+            });
+        }
+        res.json({
+            message: "Rendelés törölve"
+        });
+    });
+});
+
 
 //Product hozzáadása
 
-router.post("/product", authMiddleware, adminMiddleware, (req, res) => {
+router.post("/product", (req, res) => {
 
     const { name, price, image, category_id, description } = req.body;
 
@@ -69,17 +159,18 @@ router.post("/product", authMiddleware, adminMiddleware, (req, res) => {
 
 //Product frissítése
 
-router.put("/:id", authMiddleware, adminMiddleware, (req, res) => {
+router.put("/product/:id", (req, res) => {
 
     const { id } = req.params;
-    const { name, price, image, category_id, description } = req.body;
+    const { name, price, image, category_id, description, sizes } = req.body;
+
 
     const sql = `
         UPDATE products
-        SET name = ?, price = ?, image = ?, category_id = ?, description = ?
+        SET name = ?, price = ?, image = ?, category_id = ?, description = ?, sizes = ?
         WHERE id = ?
     `;    
-    db.run(sql, [name, price, image, category_id, description, id], function(err) {
+    db.run(sql, [name, price, image, category_id, description, sizes, id], function(err) {
 
         if (err) {
             return res.status(500).json({ message:"Adatbázis hiba" });
@@ -98,7 +189,7 @@ router.put("/:id", authMiddleware, adminMiddleware, (req, res) => {
 
 //termék törlése
 
-router.delete("/:id", authMiddleware, adminMiddleware, (req, res) => {
+router.delete("/product/:id", (req, res) => {
 
     const { id } = req.params;
     

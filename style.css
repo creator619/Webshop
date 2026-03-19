@@ -32,8 +32,9 @@ h3 {
 }
 
 /* Hero kép */
+/* A képet a backend mappából kéri be */
 .hero {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('hatter.jpg');
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('http:localhost:3000/images/hatter.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

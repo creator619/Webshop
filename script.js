@@ -1,6 +1,25 @@
 // --- SEGÉDFÜGGVÉNYEK ---
 
 // Toast értesítés megjelenítése
+
+// product adatok betöltése backendből (Ne legyen frontendbe égetve)
+
+const BASE_URL = "http://localhost:3000";
+
+let productsData = [];
+
+fetch("http://localhost:3000/products")
+    .then(res => res.json())
+    .then(data => {
+        productsData = data;
+             
+    fetchProducts();
+    })
+    .catch(err => console.error(err));
+
+
+
+
 function showToast(message) {
     const container = document.getElementById("toast-container");
     if (!container) return;
@@ -89,7 +108,7 @@ function renderProducts(list) {
     list.forEach(p => {
         container.innerHTML += `
             <div class="product-card" onclick="openProduct(${p.id})">
-                <img src="${p.image}" alt="${p.name}">
+            <img src="${BASE_URL}/images/${p.image}" alt="${p.name}">
                 <h3>${p.name}</h3>
                 <p>${p.price.toLocaleString()} Ft</p>
             </div>
@@ -141,15 +160,14 @@ if (window.location.pathname.includes("product.html")) {
     let product = JSON.parse(localStorage.getItem("selectedProduct"));
 
     // Frissítsük a termék adatait a productsData-ból, hogy biztosan meglegyenek a méretek
-    if (product && typeof productsData !== 'undefined') {
-        const freshProduct = productsData.find(p => p.id === product.id);
-        if (freshProduct) {
-            product = freshProduct;
-        }
+    if (product.sizes && typeof product.sizes === "string") {
+    product.sizes = product.sizes.split(",");
     }
 
     if (product) {
-        document.getElementById("product-img").src = product.image;
+        window.currentProduct = product;
+
+        document.getElementById("product-img").src =BASE_URL + "/images/" + product.image;
         document.getElementById("product-name").textContent = product.name;
         document.getElementById("product-price").textContent = product.price.toLocaleString() + " Ft";
         document.getElementById("product-desc").textContent = product.description;
@@ -197,7 +215,7 @@ if (window.location.pathname.includes("product.html")) {
     const addToCartBtn = document.querySelector(".add-to-cart");
     if (addToCartBtn) {
         addToCartBtn.addEventListener("click", () => {
-            const product = JSON.parse(localStorage.getItem("selectedProduct"));
+            const product = window.currentProduct;
             if (!window.selectedSize) {
                 showToast("Kérlek válassz méretet!");
                 return;
@@ -219,14 +237,13 @@ if (window.location.pathname.includes("cart.html")) {
         container.innerHTML = "<p>A kosár üres.</p>";
     } else {
         cart.forEach((item, index) => {
-            total += item.price;
-
+            total += Number(item.price);
             container.innerHTML += `
                 <div class="cart-item">
-                    <img src="${item.image}">
+                    <img src="${BASE_URL}/images/${item.image}">
                     <div>
                         <h3>${item.name} ${item.size ? `(${item.size})` : ''}</h3>
-                        <p>${item.price.toLocaleString()} Ft</p>
+                        <p>${Number(item.price).toLocaleString()} Ft</p>
                     </div>
                     <button class="remove-btn" onclick="removeItem(${index})">Törlés</button>
                 </div>
@@ -300,26 +317,38 @@ if (window.location.pathname.includes("checkout.html")) {
             }
 
             // Rendelés mentése localStorage-ba (szerver helyett)
-            let orders = JSON.parse(localStorage.getItem("orders")) || [];
-            orders.push({
-                id: Date.now(),
-                user_name: name,
-                user_email: email,
-                user_phone: phone,
-                address: address,
-                shipping_method: shippingMethod,
-                payment_method: paymentMethod,
-                items: cart,
-                total_price: total,
-                date: new Date().toISOString()
-            });
-            localStorage.setItem("orders", JSON.stringify(orders));
 
-            showToast("Rendelés sikeresen leadva!");
-            localStorage.removeItem("cart");
-            setTimeout(() => {
-                window.location.href = "index.html";
+            // javítva http request-el.
+            // ? Elkérjük a felhasználó nevét és számát, de azok nincsenek táblába mentve ?
+
+            fetch("http://localhost:3000/orders", {
+                method:"POST",
+                headers:{
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user_name: name,
+                    user_email: email,
+                    user_phone: phone,
+                    address: address,
+                    shipping_method: shippingMethod,
+                    payment_method: paymentMethod,
+                    items: cart,
+                    total_price: total,
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                showToast("Rendelés sikeresen leadva!");
+                localStorage.removeItem("cart");
+                setTimeout(() => {
+                    window.location.href = "index.html";
             }, 1500);
+            })
+            .catch(err => {
+                console.error(err);
+                showToast("Hiba történt!");
+            });
         });
     }
 }
