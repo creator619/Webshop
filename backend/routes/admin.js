@@ -68,7 +68,7 @@ router.post("/test1", authMiddleware, (req, res) => {
 
 // Rendelés tábla lekérdezése
 
-router.get("/orders/", (req, res) => {
+router.get("/orders/", authMiddleware, adminMiddleware, (req, res) => {
 
     db.all("SELECT * FROM orders", [], (err, rows) => {
 
@@ -82,7 +82,7 @@ router.get("/orders/", (req, res) => {
 
 // Rendelés frissítése
 
-router.put("/orders/:id", (req, res) => {
+router.put("/orders/:id", authMiddleware, adminMiddleware, (req, res) => {
     const { id } = req.params;
     const { user_email, total_price, status, created_at } = req.body;
 
@@ -110,7 +110,7 @@ router.put("/orders/:id", (req, res) => {
 
 // rendelés törlése
 
-router.delete("/orders/:id", (req, res) => {
+router.delete("/orders/:id", authMiddleware, adminMiddleware, (req, res) => {
 
     const { id } = req.params;
     
@@ -138,7 +138,7 @@ router.delete("/orders/:id", (req, res) => {
 
 //Product hozzáadása
 
-router.post("/product", (req, res) => {
+router.post("/product", authMiddleware, adminMiddleware,(req, res) => {
 
     const { name, price, image, category_id, description } = req.body;
 
@@ -159,7 +159,7 @@ router.post("/product", (req, res) => {
 
 //Product frissítése
 
-router.put("/product/:id", (req, res) => {
+router.put("/product/:id", authMiddleware, adminMiddleware, (req, res) => {
 
     const { id } = req.params;
     const { name, price, image, category_id, description, sizes } = req.body;
@@ -189,7 +189,7 @@ router.put("/product/:id", (req, res) => {
 
 //termék törlése
 
-router.delete("/product/:id", (req, res) => {
+router.delete("/product/:id", authMiddleware, adminMiddleware,(req, res) => {
 
     const { id } = req.params;
     

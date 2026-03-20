@@ -11,8 +11,7 @@ function authMiddleware(req, res, next) {
  //teszteléshez a thunder shockot használtam, ha nem ismered a header részbe kell beraknod egy Authorization: Bearer KULCS_ADATA részt.
  try {
     const decoded = jwt.verify(token, "titkoskulcs123"); //titkosítani a key-t
-    req.userId = decoded.userId;
-    req.role = decoded.role;
+    req.user = decoded;
 
     next();
     

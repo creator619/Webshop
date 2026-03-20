@@ -29,7 +29,7 @@ router.post("/register", async (req, res) => {
                 [name, email, hashed, role],
                 function (err) {
                     if (err) return res.status(500).json({ message: "Hiba a mentés során" });
-                    res.json({ message: "Sikeres regisztráció!" });
+                    res.json({ success: true });
                 }
             );
         } catch (error) {
@@ -75,6 +75,7 @@ router.post("/login", (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
+                role: user.role
             }
         });
     });

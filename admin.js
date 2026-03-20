@@ -20,7 +20,11 @@ function setupTabs() {
 }
 
 function loadProducts() {
-    fetch(BASE_URL + "/products")
+    fetch(BASE_URL + "/products", {
+         headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        }
+    })
         .then(res => res.json())
         .then(data => {
             const tbody = document.querySelector("#admin-products-table tbody");
@@ -67,7 +71,10 @@ function saveProduct() {
         // UPDATE
         fetch(BASE_URL + "/admin/product/" + id, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+             },
             body: JSON.stringify(product)
         }).then(() => {
             loadProducts();
@@ -75,9 +82,12 @@ function saveProduct() {
         });
     } else {
         // CREATE
-        fetch(BASE_URL + "/products", {
+        fetch(BASE_URL + "/admin/product", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+             },
             body: JSON.stringify(product)
         }).then(() => {
             loadProducts();
@@ -87,7 +97,11 @@ function saveProduct() {
 }
 
 function editProduct(id) {
-    fetch(BASE_URL + "/products/" + id)
+    fetch(BASE_URL + "/products/" + id, {
+         headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        }
+    })
         .then(res => res.json())
         .then(p => {
             showProductForm();
@@ -105,13 +119,20 @@ function editProduct(id) {
 function deleteProduct(id) {
     if (!confirm("Biztos törlöd?")) return;
 
-    fetch(BASE_URL + "/admin/products/" + id, {
+    fetch(BASE_URL + "/admin/product/" + id, {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
         method: "DELETE"
     }).then(() => loadProducts());
 }
 
 function loadOrders() {
-    fetch(BASE_URL + "/admin/orders/")
+    fetch(BASE_URL + "/admin/orders/", {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        }
+    })
         .then(res => res.json())
         .then(data => {
             const tbody = document.querySelector("#admin-orders-table tbody");

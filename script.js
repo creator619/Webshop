@@ -47,13 +47,16 @@ function updateAuthUI() {
     if (user && userNav) {
         userNav.innerHTML = `
             <li class="user-info">
-                <span class="username">👤 ${user.name}</span>
+                <span class="username" onclick="goToProfile()" style="cursor:pointer;">👤 ${user.name}</span>
                 <button class="logout-btn" onclick="logout()">Kijelentkezés</button>
             </li>
         `;
     }
 }
 
+function goToProfile() {
+    window.location.href = "profile.html";
+}
 function logout() {
     localStorage.removeItem("user");
     showToast("Sikeres kijelentkezés!");
@@ -367,19 +370,30 @@ if (window.location.pathname.includes("register.html")) {
             return;
         }
 
-        let users = JSON.parse(localStorage.getItem("users")) || [];
-        if (users.find(u => u.email === email)) {
-            showToast("Ez az email cím már regisztrálva van!");
-            return;
-        }
+        // ellenőrizni az adatokat sql injection miatt
 
-        users.push({ name, email, password });
-        localStorage.setItem("users", JSON.stringify(users));
+        
 
-        showToast("Regisztráció sikeres!");
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 1500);
+        fetch(BASE_URL + "/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name, email, password })
+        })
+        
+        .then(res => res.json({}))
+        .then(data => {
+            if (data.error) {
+                showToast(data.error);
+                return;
+            }
+            showToast("Regisztráció sikeres!");
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1000);
+        })
+        .catch(() => showToast("Hiba történt!"));
     });
 }
 
@@ -390,17 +404,46 @@ if (window.location.pathname.includes("login.html")) {
         const email = document.getElementById("login-email").value;
         const password = document.getElementById("login-password").value;
 
-        let users = JSON.parse(localStorage.getItem("users")) || [];
-        const user = users.find(u => u.email === email && u.password === password);
+        if (!email || !password) {
+            showToast("Tölts ki minden mezőt!");
+            return;
+        }
 
-        if (user) {
-            localStorage.setItem("user", JSON.stringify(user));
+        fetch(BASE_URL + "/auth/login", {
+            method:"POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("LOGIN RESPONSE:", data);
+
+
+           if (data.message === "Hibás email vagy jelszó!") {
+                showToast(data.message);
+                return;
+            }
+
+            localStorage.setItem("token", data.token);
+
+            const userData = {
+                ...data.user,
+                role: data.user.role || null
+            };
+
+            localStorage.setItem("user", JSON.stringify(userData));
+
             showToast("Sikeres bejelentkezés!");
+            
             setTimeout(() => {
                 window.location.href = "index.html";
             }, 1000);
-        } else {
-            showToast("Hibás email vagy jelszó!");
-        }
+        })
+        .catch(err => {
+            console.error(err);
+            showToast("Szerver hiba!");
+        });
     });
 }
