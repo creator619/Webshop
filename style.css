@@ -290,6 +290,27 @@ button {
     border-color: var(--accent);
 }
 
+.quantity-selection {
+    margin-bottom: 30px;
+}
+
+.quantity-selection h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.quantity-selection input {
+    width: 80px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 1.1rem;
+    text-align: center;
+    font-weight: 700;
+}
+
 .add-to-cart {
     padding: 15px 40px;
     background: var(--primary);
