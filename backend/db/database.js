@@ -59,6 +59,15 @@ function initDb() {
             FOREIGN KEY(order_id) REFERENCES orders(id)
         )`);
 
+            // Product Stock tábla
+            db.run(`CREATE TABLE IF NOT EXISTS product_stock (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                product_id INTEGER,
+                size TEXT,
+                stock INTEGER,
+                FOREIGN KEY(product_id) REFERENCES products(id)
+            )`);
+
             // Ha üres a products tábla, töltsük fel
             db.get("SELECT count(*) as count FROM products", (err, row) => {
                 if (row.count === 0) {
@@ -86,11 +95,30 @@ function initDb() {
                     ];
 
                     const stmt = db.prepare("INSERT INTO products (name, price, image, category_id, description, sizes) VALUES (?, ?, ?, ?, ?, ?)");
+                    const stockStmt = db.prepare("INSERT INTO product_stock (product_id, size, stock) VALUES (?, ?, ?)");
+
+                    let completed = 0;
                     products.forEach(p => {
-                        stmt.run(p.name, p.price, p.image, p.category_id, p.description, p.sizes);
+                        stmt.run(p.name, p.price, p.image, p.category_id, p.description, p.sizes, function(err) {
+                            if (err) {
+                                console.error(err.message);
+                            } else {
+                                const productId = this.lastID;
+                                const sizeList = p.sizes.split(",");
+                                sizeList.forEach(size => {
+                                    const randomStock = Math.floor(Math.random() * 20) + 1;
+                                    stockStmt.run(productId, size.trim(), randomStock);
+                                });
+                            }
+                            
+                            completed++;
+                            if (completed === products.length) {
+                                stmt.finalize();
+                                stockStmt.finalize();
+                                console.log("Termékek és készlet adatok sikeresen feltöltve!");
+                            }
+                        });
                     });
-                    stmt.finalize();
-                    console.log("Termékek sikeresen feltöltve!");
                 }
             });
         });
