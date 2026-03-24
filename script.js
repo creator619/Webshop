@@ -182,11 +182,22 @@ if (window.location.pathname.includes("product.html")) {
             product.sizes.forEach(size => {
                 const btn = document.createElement("button");
                 btn.className = "size-btn";
-                btn.textContent = size;
+                
+                const trimmedSize = size.trim();
+                const stockCount = (product.stock && product.stock[trimmedSize]) !== undefined ? product.stock[trimmedSize] : null;
+                
+                btn.textContent = stockCount !== null ? `${trimmedSize} (${stockCount} db)` : trimmedSize;
+                
+                if (stockCount === 0) {
+                    btn.disabled = true;
+                    btn.style.opacity = "0.5";
+                    btn.style.cursor = "not-allowed";
+                }
+
                 btn.onclick = () => {
                     document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("active"));
                     btn.classList.add("active");
-                    window.selectedSize = size;
+                    window.selectedSize = trimmedSize;
                 };
                 sizeContainer.appendChild(btn);
             });
@@ -200,7 +211,8 @@ function updateCartCount() {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     const countSpan = document.getElementById("cart-count");
     if (countSpan) {
-        countSpan.textContent = `(${cart.length})`;
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        countSpan.textContent = `(${totalItems})`;
     }
 }
 
@@ -208,7 +220,16 @@ updateCartCount();
 
 function addToCart(product) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push(product);
+    
+    // Ellenőrizzük, hogy benne van-e már ugyanez a termék ugyanebben a méretben
+    const existingIndex = cart.findIndex(item => item.id === product.id && item.size === product.size);
+    
+    if (existingIndex > -1) {
+        cart[existingIndex].quantity += product.quantity;
+    } else {
+        cart.push(product);
+    }
+    
     localStorage.setItem("cart", JSON.stringify(cart));
     showToast("Hozzáadva a kosárhoz!");
     updateCartCount();
@@ -223,7 +244,22 @@ if (window.location.pathname.includes("product.html")) {
                 showToast("Kérlek válassz méretet!");
                 return;
             }
-            const productWithSize = { ...product, size: window.selectedSize };
+            
+            const quantityInput = document.getElementById("product-qty");
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+            
+            if (quantity <= 0) {
+                showToast("Érvénytelen mennyiség!");
+                return;
+            }
+
+            const stockCount = product.stock ? product.stock[window.selectedSize] : 0;
+            if (quantity > stockCount) {
+                showToast(`Nincs ennyi készleten! (Elérhető: ${stockCount} db)`);
+                return;
+            }
+
+            const productWithSize = { ...product, size: window.selectedSize, quantity: quantity };
             addToCart(productWithSize);
         });
     }
@@ -240,13 +276,14 @@ if (window.location.pathname.includes("cart.html")) {
         container.innerHTML = "<p>A kosár üres.</p>";
     } else {
         cart.forEach((item, index) => {
-            total += Number(item.price);
+            total += Number(item.price) * item.quantity;
             container.innerHTML += `
                 <div class="cart-item">
                     <img src="${BASE_URL}/images/${item.image}">
                     <div>
                         <h3>${item.name} ${item.size ? `(${item.size})` : ''}</h3>
-                        <p>${Number(item.price).toLocaleString()} Ft</p>
+                        <p>${Number(item.price).toLocaleString()} Ft x ${item.quantity}</p>
+                        <p>Összesen: ${(Number(item.price) * item.quantity).toLocaleString()} Ft</p>
                     </div>
                     <button class="remove-btn" onclick="removeItem(${index})">Törlés</button>
                 </div>
@@ -285,12 +322,12 @@ if (window.location.pathname.includes("checkout.html")) {
     container.innerHTML = "";
 
     cart.forEach(item => {
-        total += item.price;
+        total += item.price * item.quantity;
 
         container.innerHTML += `
             <div class="checkout-item">
-                <span>${item.name} ${item.size ? `(${item.size})` : ''}</span>
-                <span>${item.price.toLocaleString()} Ft</span>
+                <span>${item.name} ${item.size ? `(${item.size})` : ''} x ${item.quantity}</span>
+                <span>${(item.price * item.quantity).toLocaleString()} Ft</span>
             </div>
         `;
     });
