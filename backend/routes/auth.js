@@ -12,6 +12,12 @@ router.post("/register", async (req, res) => {
     if (!name || !email || !password) {
         return res.status(400).json({ message: "Minden mező kötelező!" });
     }
+    if (name.length > 100 || email.length > 100 || password.length > 100) {
+        return res.status(400).json({ message: "Név, az email vagy a jelszó túl hosszú!" });
+    }
+    if (name.includes("<")) {
+        return res.status(400).json({ message: "Nem megfelelő név!" });
+    }
 
     // Email ellenőrzés
     db.get("SELECT * FROM users WHERE email = ?", [email], async (err, row) => {
@@ -44,6 +50,9 @@ router.post("/login", (req, res) => {
 
     if (!email || !password) {
         return res.status(400).json({ message: "Minden mező kötelező!" });
+    }
+    if (email.length > 100 || password.length > 100) {
+        return res.status(400).json({ message: "Hibás email vagy jelszó!" });
     }
 
     db.get("SELECT * FROM users WHERE email = ?", [email], async (err, user) => {
