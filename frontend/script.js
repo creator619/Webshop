@@ -4,11 +4,11 @@
 
 // product adatok betöltése backendből (Ne legyen frontendbe égetve)
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "http://192.168.0.164:3000";
 
 let productsData = [];
 
-fetch("http://localhost:3000/products")
+fetch(BASE_URL + "/products")
     .then(res => res.json())
     .then(data => {
         productsData = data;
@@ -253,8 +253,11 @@ if (window.location.pathname.includes("product.html")) {
                 return;
             }
 
+            //???
+
             const stockCount = product.stock ? product.stock[window.selectedSize] : 0;
             if (quantity > stockCount) {
+                console.log(stockCount, product, product.stock)
                 showToast(`Nincs ennyi készleten! (Elérhető: ${stockCount} db)`);
                 return;
             }
@@ -360,8 +363,8 @@ if (window.location.pathname.includes("checkout.html")) {
 
             // javítva http request-el.
             // ? Elkérjük a felhasználó nevét és számát, de azok nincsenek táblába mentve ?
-
-            fetch("http://localhost:3000/orders", {
+            BASE_URL + "/orders"
+            fetch(BASE_URL + "/orders", {
                 method:"POST",
                 headers:{
                     "Content-Type": "application/json"
