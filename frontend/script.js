@@ -257,7 +257,6 @@ if (window.location.pathname.includes("product.html")) {
 
             const stockCount = product.stock ? product.stock[window.selectedSize] : 0;
             if (quantity > stockCount) {
-                console.log(stockCount, product, product.stock)
                 showToast(`Nincs ennyi készleten! (Elérhető: ${stockCount} db)`);
                 return;
             }
