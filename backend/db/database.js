@@ -23,6 +23,17 @@ function initDb() {
             role TEXT
         )`);
 
+
+        // User_profiles tábla
+        db.run(`CREATE TABLE IF NOT EXISTS user_profiles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            phone TEXT,
+            zip TEXT,
+            city TEXT,
+            address TEXT
+        )`);
+
         // Products tábla
 
         // Módosítás nem volt méret oszlop és így a frontend nem működött, ezért bele raktam.

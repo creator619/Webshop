@@ -35,7 +35,19 @@ router.post("/register", async (req, res) => {
                 [name, email, hashed, role],
                 function (err) {
                     if (err) return res.status(500).json({ message: "Hiba a mentés során" });
-                    res.json({ success: true });
+
+                    const userId = this.lastID;
+
+                    //profil létrehozása
+                    db.run(
+                        "INSERT INTO user_profiles (user_id) VALUES (?)",
+                        [userId],
+                        (err) => {
+                        if (err) return res.status(500).json({ message: "Profil létrehozási hiba"});
+
+                        res.json({ success: true });
+                        }
+                    );
                 }
             );
         } catch (error) {
@@ -90,5 +102,40 @@ router.post("/login", (req, res) => {
     });
 });
 
+//Nincs kész tokenből kell hogy kérje a profil id-t, majd javítom
+
+router.get("/profile", authMiddleware, (req, res) => {
+    const userId = req.user.id;
+    
+    db.get(`
+    SELECT u.name, u.email, p.phone, p.zip, p.city, p.address
+    FROM users u
+    LEFT JOIN user_profiles p ON u.id = p.user_id
+    WHERE u.id = ?    
+    `, [userId], (err, row) => {
+        if (err) return res.status(500).json({ message: "Hiba a profil adatainak lekérdezésekor!" });
+    
+        res.json(row);
+        });
+    });
+
+router.put("/profile", authMiddleware, (res, req) => {
+    const userId = req.user.id;
+    const { phone, zip, city, address } = req.body;
+
+
+    db.run(`
+        UPDATE user_profiles
+        SET phone = ?, zip = ?, city = ?, address = ?
+        WHERE user_id = ?
+    `,
+    [phone, zip, city, address, userId],
+    function (err) {
+        if (err) {
+            return res.status(500).json({ message: "Hiba mentés közben" });
+        }
+        res.json({ success: true});
+    });
+});
 
 module.exports = router;

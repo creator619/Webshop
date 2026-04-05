@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="hu">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Termék részletek</title>
+    <title>Szállítási információk</title>
     <link rel="stylesheet" href="style.css?v=1.1">
+    <link rel="stylesheet" href="szallitas.css">
 </head>
-
 <body>
+    <header class="hero">
+        <div class="hero-text">
+            <h1>Férfi Elegancia</h1>
+            <p>Prémium minőségű ingek, zakók, nadrágok és cipők.</p>
+        </div>
+    </header>
 
     <nav class="menu">
         <button class="mobile-menu-toggle" id="mobile-menu-toggle">☰</button>
@@ -20,35 +25,58 @@
             <div id="user-nav" class="user-status"></div>
         </ul>
     </nav>
+  
+<main class="shipping-container">
 
-    <main class="product-page">
-        <div class="product-image">
-            <img id="product-img" src="" alt="">
-        </div>
+    <h2 class="section-title">Szállítási információk</h2>
 
-        <div class="product-info">
-            <h1 id="product-name"></h1>
-            <p id="product-price" class="price"></p>
-            <p id="product-desc" class="description"></p>
-
-            <div class="size-selection">
-                <h3>Válassz méretet:</h3>
-                <div id="size-options" class="size-options"></div>
-            </div>
-
-            <div class="quantity-selection">
-                <h3>Mennyiség:</h3>
-                <input type="number" id="product-qty" value="1" min="1" max="99">
-            </div>
-
-            <button class="add-to-cart">Kosárba</button>
-        </div>
-    </main>
-
-    <div class="shipping-banner">
-        <span>🚚 10.000 Ft felett <strong>INGYENES</strong> a szállítás!</span>
+    <div class="shipping-card">
+        <h3>🚚 Szállítási módok</h3>
+        <ul>
+            <li>Házhozszállítás futárral</li>
+            <li>Csomagautomata (Foxpost / Packeta)</li>
+            <li>Személyes átvétel (előre egyeztetve)</li>
+        </ul>
     </div>
 
+    <div class="shipping-card">
+        <h3>⏱ Szállítási idő</h3>
+        <p>
+            A rendeléseket 1-2 munkanapon belül feldolgozzuk.<br>
+            A kiszállítás várható ideje: <strong>2-5 munkanap</strong>.
+        </p>
+    </div>
+
+    <div class="shipping-card">
+        <h3>💰 Szállítási díjak</h3>
+        <ul>
+            <li>Házhozszállítás: 1 490 Ft</li>
+            <li>Csomagautomata: 990 Ft</li>
+            <li><strong>10 000 Ft felett INGYENES</strong></li>
+        </ul>
+    </div>
+
+    <div class="shipping-card">
+        <h3>📦 Rendelés követése</h3>
+        <p>
+            A csomag feladásáról e-mailben értesítünk, amely tartalmazza a nyomkövetési linket.
+        </p>
+    </div>
+
+    <div class="shipping-card">
+        <h3>🔄 Méretcsere és visszaküldés</h3>
+        <p>
+            Nem lett jó a méret? Semmi gond!<br>
+            A termékeket 14 napon belül visszaküldheted vagy cserélheted.
+        </p>
+    </div>
+
+</main>
+
+<div class="shipping-banner">
+    <span>🚚 10.000 Ft felett <strong>INGYENES</strong> a szállítás!</span>
+</div>
+    
     <footer class="site-footer">
         <div class="footer-container">
             <div class="footer-section">
@@ -82,14 +110,9 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 Ruházati Webshop - Minden jog fenntartva.</p>
+            <p>&copy; 2026 Ruházati Webshop - Minden jog fenntartva.</p>
         </div>
     </footer>
-
-    <div id="toast-container" class="toast-container"></div>
-
-   <!--<script src="products_data.js?v=1.1"></script> --> 
     <script src="script.js?v=1.1"></script>
 </body>
-
 </html>

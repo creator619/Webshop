@@ -4,10 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil</title>
+    <link rel="stylesheet" href="style.css?v=1.1">
+    <link rel="stylesheet" href="profile.css">
 </head>
 <body>
+    <header class="hero">
+        <div class="hero-text">
+            <h1>Férfi Elegancia</h1>
+            <p>Prémium minőségű ingek, zakók, nadrágok és cipők.</p>
+        </div>
+    </header>
+    
+    <nav class="menu">
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">☰</button>
+        <ul id="main-menu">
+            <li onclick="window.location.href='index.html'">Főoldal</li>
+            <li onclick="window.location.href='cart.html'" class="cart-menu">
+                Kosár <span id="cart-count">(0)</span>
+            </li>
+            <div id="user-nav" class="user-status"></div>
+        </ul>
+    </nav>
+
+
     <a href="admin.html">admin</a>
 
-    <script src="profile.js"></script>
+
+<main class="profile-container">
+
+    <h2 class="section-title">Profilom</h2>
+
+    <!-- Felhasználói adatok -->
+    <div class="profile-card">
+        <h3>👤 Személyes adatok</h3>
+        <p><strong>Név:</strong> <span id="user-name">Teszt Elek</span></p> <!-- Backend kell endpoint (/auth/me)-->
+        <p><strong>Email:</strong> <span id="user-email">teszt@email.com</span></p>
+        <p><strong>Telefon:</strong> <span id="user-phone">+36 30 123 4567</span></p>
+        <button class="profile-btn">Adatok szerkesztése</button>
+    </div>
+
+    <!-- Szállítási adatok -->
+    <div class="profile-card">
+        <h3>📍 Szállítási cím</h3>
+        <p><strong>Irányítószám:</strong> <span id="user-zip">1051</span></p>
+        <p><strong>Város:</strong> <span id="user-city">Budapest</span></p>
+        <p><strong>Cím:</strong> <span id="user-address">Fashion utca 12.</span></p>
+        <button class="profile-btn">Cím módosítása</button>
+    </div>
+
+    <!-- Rendelések -->
+    <div class="profile-card">
+        <h3>📦 Rendeléseim</h3>
+
+        <div class="order-item">
+            <p><strong>Rendelés ID:</strong> #12345</p>
+            <p><strong>Dátum:</strong> 2026-04-01</p>
+            <p><strong>Állapot:</strong> Kiszállítva</p>
+        </div>
+
+        <div class="order-item">
+            <p><strong>Rendelés ID:</strong> #12346</p>
+            <p><strong>Dátum:</strong> 2026-04-03</p>
+            <p><strong>Állapot:</strong> Feldolgozás alatt</p>
+        </div>
+
+    </div>
+
+    <!-- Kijelentkezés -->
+    <div class="profile-card">
+        <h3>🔒 Fiók</h3>
+        <button class="logout-btn">Kijelentkezés</button>
+    </div>
+
+</main>
+
+
+
+
+<footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Rólunk</h4>
+                <p>Prémium férfiruha webshop, ahol a stílus és a minőség találkozik. Válogatott kollekcióinkkal
+                    segítünk, hogy minden alkalommal a legjobb formádat hozhasd.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Gyors Linkek</h4>
+                <ul>
+                    <li><a href="index.html">Főoldal</a></li>
+                    <li><a href="cart.html">Kosár</a></li>
+                    <li><a href="login.html">Bejelentkezés</a></li>
+                    <li><a href="register.html">Regisztráció</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Ügyfélszolgálat</h4>
+                <ul>
+                    <li><a href="szallitas.html">Szállítási információk</a></li>
+                    <li><a href="#">Gyakori kérdések</a></li>
+                    <li><a href="#">Visszaküldés</a></li>
+                    <li><a href="#">Adatkezelés</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Kapcsolat</h4>
+                <p>Email: info@webshop.hu</p>
+                <p>Telefon: +36 30 123 4567</p>
+                <p>Cím: 1051 Budapest, Fashion utca 12.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Ruházati Webshop - Minden jog fenntartva.</p>
+        </div>
+    </footer>
+
+     <script src="profile.js"></script>
+        
 </body>
 </html>
