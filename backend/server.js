@@ -5,15 +5,43 @@ const app = express();
 const rateLimit = require("express-rate-limit");
 
 const PORT = 3000;
-const HOST = "192.168.0.164";  // a géped IP címe a hálózaton
+
+//= "192.168.0.164";  // a géped IP címe a hálózaton
 const limiter = rateLimit({
     windowMs: 60 * 1000, // 1 perc
     max: 50, // max 50 request
     message: "Túl sok kérés, próbáld később"
 });
 
+const os = require("os");
+
+function getLocalIP() {
+    const interfaces = os.networkInterfaces();
+
+    for (const name in interfaces) {
+        for (const net of interfaces[name]) {
+            if (net.family === "IPv4" && !net.internal) {
+                return net.address;
+            }
+        }
+    }
+
+    return null;
+}
+
+const LOCAL_IP = getLocalIP();
+
+console.log("IP:", LOCAL_IP);
+
+app.get("/config", (req, res) => {
+    res.json({
+        ip: LOCAL_IP,
+        port: 3000
+    });
+});
+
 app.use(cors({
-    origin: "http://${HOST}:${PORT}" // frontend címe
+    origin: "http://${LOCAL_IP}:${PORT}" // frontend címe
 }));
 app.use(express.json());
 app.use(express.static("../frontend"));
@@ -27,19 +55,7 @@ app.use(express.static("../frontend"));
 
 // Routes
 
-app.use((req, res, next) => {
-    const ip = req.ip;
 
-    if (ip.startsWith("::fffff:")) {
-        ip = ip.replace("::ffff:", "");
-    }
-    
-    if (ip.startsWith("192.168.") || ip === ":1") {
-        next();
-    } else {
-        res.status(403).send("Tiltott hozzáférés");
-    }
-});
 
 app.use("/auth", limiter, require("./routes/auth"));
 app.use("/products", limiter, require("./routes/products"));
@@ -76,6 +92,6 @@ app.get("/:page", (req, res) => {
 });
 
 //app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-app.listen(PORT, HOST, () => {
-    console.log(`Server running on http://${HOST}:${PORT}`);
+app.listen(PORT, LOCAL_IP, () => {
+    console.log(`Server running on http://${LOCAL_IP}:${PORT}`);
 });

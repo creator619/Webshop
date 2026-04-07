@@ -1,9 +1,22 @@
 // ==========================================
 // KONFIGURÁCIÓ
 // ==========================================
+let BASE_URL = "";
+let API_URL = "";
 
-const BASE_URL = "http://192.168.0.164:3000";
-const API_URL = BASE_URL; // Az új backend nem használ /api előtagot
+// induláskor lekérjük
+async function initConfig() {
+    const res = await fetch("/config");
+    const data = await res.json();
+
+    BASE_URL = `http://${data.ip}:${data.port}`;
+    API_URL = BASE_URL;
+
+    console.log("BASE_URL:", BASE_URL);
+}
+
+// ezt hívd meg induláskor
+initConfig();
 
 /**
  * Segédfüggvény a termékképek elérési útjának meghatározásához.
