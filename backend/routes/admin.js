@@ -10,6 +10,7 @@ const sqlite3 = require('sqlite3').verbose();
 
 const authMiddleware = require("../Middleware/authMiddleware");
 const adminMiddleware = require("../Middleware/adminMiddleware");
+const { message } = require("statuses");
 
 // törölni 
 
@@ -37,7 +38,7 @@ router.get("/useradat", authMiddleware, (req, res) => {
 });
 
 router.get("/test", authMiddleware, adminMiddleware, (req, res) => {
-    db.all("SELECT * FROM products", [], (err, rows) => {
+    db.all("SELECT * FROM user_profiles", [], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -214,6 +215,71 @@ router.delete("/product/:id", authMiddleware, adminMiddleware,(req, res) => {
     });
 });
 
+
+//Category lekérés
+
+router.get("/categories", authMiddleware, adminMiddleware, (req, res) => {
+
+    db.all("SELECT * FROM category", [], (err, rows) => {
+
+        if (err) {
+            return res.status(500).json({message: "Hiba"});
+        }
+        res.json(rows);
+    });
+});
+
+router.post("/categories", authMiddleware, adminMiddleware, (req, res) => {
+
+    const { name } = req.body;
+
+    const sql = `
+        INSERT INTO category (name)
+        VALUES (?)
+    `;
+    db.run(sql, [name], function(err) {
+
+        if (err) {
+            return res.status(500).json({ message: "hiba" });
+        }
+        res.json({
+            success: true,
+            message:"Kategória sikeresen hozzáadva!"
+        });
+    });
+});
+
+
+router.put("/categories", authMiddleware, adminMiddleware, (req, res) => {
+    const { name, id } = req.body;
+    const sql = `
+        UPDATE category
+        SET name = ?
+        WHERE id = ?
+    `;
+    db.run(sql, [name, id], function(err) {
+
+        if (err) {
+            return res.status(500).json({ message: "hiba" });
+        }
+        res.json({
+            success: true,
+            message:"Kategória sikeresen frissítve!"
+        });
+    });
+});
+//Contact lekérdezés
+
+router.get("/contact", authMiddleware, adminMiddleware, (req, res) => {
+   
+   db.all("SELECT * FROM contact", [], (err, rows) => {
+    
+    if (err) {
+        return res.status(500).json( { message: "Hiba" });
+    }
+    res.json(rows);
+    });
+});
 
 module.exports = router;
 

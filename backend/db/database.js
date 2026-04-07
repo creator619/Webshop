@@ -14,6 +14,9 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 function initDb() {
     db.serialize(() => {
+        //foreing key bekapcsolása
+        db.run("PRAGMA foreign_keys = ON");
+        
         // Users tábla
         db.run(`CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,11 +30,31 @@ function initDb() {
         // User_profiles tábla
         db.run(`CREATE TABLE IF NOT EXISTS user_profiles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
+            user_id INTEGER UNIQUE,
             phone TEXT,
             zip TEXT,
             city TEXT,
             address TEXT
+        )`);
+
+        // Category tábla
+        
+        db.run(`CREATE TABLE IF NOT EXISTS category (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT
+        )`);
+
+        // Contact tábla
+        
+        db.run(`CREATE TABLE IF NOT EXISTS contact (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            name TEXT,
+            email TEXT,
+            category_id INTEGER,
+            message TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (category_id) REFERENCES category(id)
         )`);
 
         // Products tábla

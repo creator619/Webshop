@@ -103,6 +103,9 @@ router.post("/login", (req, res) => {
 });
 
 //Nincs kész tokenből kell hogy kérje a profil id-t, majd javítom
+// tesztelni kell még nem lett tesztelve
+// frontend részét meg kell hozzá csinálni
+
 
 router.get("/profile", authMiddleware, (req, res) => {
     const userId = req.user.id;
@@ -119,22 +122,39 @@ router.get("/profile", authMiddleware, (req, res) => {
         });
     });
 
-router.put("/profile", authMiddleware, (res, req) => {
+router.put("/profile", authMiddleware, (req, res) => {
     const userId = req.user.id;
     const { phone, zip, city, address } = req.body;
 
-
     db.run(`
-        UPDATE user_profiles
-        SET phone = ?, zip = ?, city = ?, address = ?
-        WHERE user_id = ?
+        INSERT INTO user_profiles (user_id, phone, zip, city, address)
+        VALUES(?, ?, ?, ?, ?)
+        ON CONFLICT(user_id) DO UPDATE SET
+            phone = excluded.phone,
+            zip = excluded.zip,
+            city = excluded.city,
+            address = excluded.address
+        WHERE
+            phone IS NOT excluded.phone OR
+            zip IS NOT excluded.zip OR
+            city IS NOT excluded.city OR
+           address IS NOT excluded.address
     `,
-    [phone, zip, city, address, userId],
-    function (err) {
+    [userId, phone, zip, city, address], function (err) {
         if (err) {
+            console.log(err);
             return res.status(500).json({ message: "Hiba mentés közben" });
         }
-        res.json({ success: true});
+        if (this.changes === 0) {
+            return res.json({
+                success: true,
+                message: "Nem történt változás"
+            });
+        }
+        res.json({
+            success: true,
+            message:"Profil frissítve"
+        });
     });
 });
 
