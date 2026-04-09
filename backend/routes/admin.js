@@ -10,7 +10,6 @@ const sqlite3 = require('sqlite3').verbose();
 
 const authMiddleware = require("../Middleware/authMiddleware");
 const adminMiddleware = require("../Middleware/adminMiddleware");
-const { message } = require("statuses");
 
 // törölni 
 
@@ -163,15 +162,16 @@ router.post("/product", authMiddleware, adminMiddleware,(req, res) => {
 router.put("/product/:id", authMiddleware, adminMiddleware, (req, res) => {
 
     const { id } = req.params;
+    const strockString = JSON.stringify(req.body.stock);
     const { name, price, image, category_id, description, sizes } = req.body;
 
 
     const sql = `
         UPDATE products
-        SET name = ?, price = ?, image = ?, category_id = ?, description = ?, sizes = ?
+        SET name = ?, price = ?, image = ?, category_id = ?, description = ?, sizes = ?, stock = ?
         WHERE id = ?
     `;    
-    db.run(sql, [name, price, image, category_id, description, sizes, id], function(err) {
+    db.run(sql, [name, price, image, category_id, description, sizes, strockString, id], function(err) {
 
         if (err) {
             return res.status(500).json({ message:"Adatbázis hiba" });
@@ -268,6 +268,7 @@ router.put("/categories", authMiddleware, adminMiddleware, (req, res) => {
         });
     });
 });
+
 //Contact lekérdezés
 
 router.get("/contact", authMiddleware, adminMiddleware, (req, res) => {
@@ -280,6 +281,35 @@ router.get("/contact", authMiddleware, adminMiddleware, (req, res) => {
     res.json(rows);
     });
 });
+
+//Users lekérdezés
+
+router.get("/users", authMiddleware, adminMiddleware, (req, res) => {
+
+    db.all("SELECT * FROM users", [], (err, rows) => {
+
+        if (err) {
+            res.status(500).json({ error: err.message})
+        }
+        res.json(rows);
+    });
+});
+
+
+//user_profiles lekérdezés
+
+
+router.get("/profiles", authMiddleware, adminMiddleware, (req, res) => {
+
+    db.all("SELECT * FROM user_profiles", [], (err, rows) => {
+
+        if (err) {
+            res.status(500).json({ error: err.message})
+        }
+        res.json(rows);
+    });
+});
+
 
 module.exports = router;
 

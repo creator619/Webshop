@@ -1,33 +1,67 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db/database");
+const authMiddleware = require("../Middleware/authMiddleware");
+const optionalAuth = require("../Middleware/optionalAuth");
 
-router.post("/", (req, res) => {
+
+router.post("/", optionalAuth, (req, res) => {
     console.log("Rendelés érkezett:", req.body);
-    const { user_email, items, total_price } = req.body;
 
-    if (!user_email || !items || items.length === 0) {
-        console.log("Hiányzó adatok!", { user_email, items_length: items ? items.length : "undefined" });
-        return res.status(400).json({ message: "Hiányzó adatok: email vagy kosár tartalom." });
+    let user_email = null;
+    let guest_email = null;
+    let user_id = null;
+
+    if (req.user) {
+        user_email = req.user.email;
+        user_id = req.user.id;
+    } else {
+        // vendég
+        guest_email = req.body.email;
+
+        if (!guest_email) {
+            return res.status(400).json({
+                message: "Vendég rendeléshez email kötelező!"
+            });
+        }
     }
 
-    // 1. Rendelés beszúrása
-    const stmt = db.prepare("INSERT INTO orders (user_email, total_price) VALUES (?, ?)");
-    stmt.run(user_email, total_price, function (err) {
-        if (err) {
-            return res.status(500).json({ message: "Hiba a rendelés mentésekor.", error: err.message });
-        }
+    const { items, total_price } = req.body;
 
-        const orderId = this.lastID; // Az új rendelés ID-ja
+    if (!items || items.length === 0) {
+        return res.status(400).json({ 
+            message: "Hiányzó kosár tartalom." 
+        });
+    }
 
-        // 2. Tételek beszúrása
-        const itemStmt = db.prepare("INSERT INTO order_items (order_id, product_name, price, quantity) VALUES (?, ?, ?, ?)");
+    //backendnek kellene kiszámolnia az árat, frontend manipulálható
+    if (total_price == null) {
+    return res.status(400).json({
+        message: "Hiányzó végösszeg."
+    });
+    }
 
-        // Aszinkron működés miatt trükkös lehet a ciklusban hibakezelés, 
-        // de SQLite Node.js driverben a serialize segít, vagy transaction.
-        // Egyszerűsítve:
-        db.serialize(() => {
+    db.serialize(() => {
             db.exec("BEGIN TRANSACTION");
+
+            const stmt = db.prepare(`
+                INSERT INTO orders (user_id, user_email, guest_email, total_price) 
+                VALUES (?, ?, ?, ?)
+            `);
+
+            stmt.run(user_id, user_email, guest_email, total_price, function (err) {
+                if (err) {
+                     db.exec("ROLLBACK");
+                    return res.status(500).json({ message: "Hiba a rendelés mentésekor.", error: err.message });
+                }
+
+            const orderId = this.lastID; // Az új rendelés ID-ja
+
+             // 2. Tételek beszúrása
+            const itemStmt = db.prepare(`
+                INSERT INTO order_items (order_id, product_name, price, quantity) 
+                VALUES (?, ?, ?, ?)
+                `);
 
             items.forEach(item => {
                 // Quantity-t most 1-nek vesszük, mert a frontend nem kezel mennyiséget külön (még)
@@ -36,17 +70,35 @@ router.post("/", (req, res) => {
 
             db.exec("COMMIT", (commitErr) => {
                 if (commitErr) {
+                    db.exec("ROLLBACK");
                     return res.status(500).json({ message: "Hiba a rendelés véglegesítésekor." });
                 }
 
-                res.status(201).json({ message: "Rendelés sikeresen leadva!", orderId: orderId });
+                stmt.finalize();
+                itemStmt.finalize();
+
+                res.status(201).json({ 
+                    message: "Rendelés sikeresen leadva!", 
+                    orderId: orderId 
+                });
             });
         });
-
-        stmt.finalize();
-        itemStmt.finalize();
     });
 });
 
+router.get("/", authMiddleware, (req, res) => {
+    const userEmail = req.user.email;
 
+    db.all(
+        "SELECT * FROM orders WHERE user_email = ?",
+        [userEmail],
+        (err, rows) => {
+            if (err) {
+                return res.status(500).json({ message: "Hiba", error: err.message });
+            }
+
+            res.json(rows);
+        }
+    );
+});
 module.exports = router;

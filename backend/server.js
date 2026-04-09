@@ -63,13 +63,19 @@ app.use("/orders", limiter, require("./routes/orders"));
 app.use("/admin", require("./routes/admin"));
 //A képfájlokat a backend statikus kiszolgálással (Express static middleware) szolgálja ki, az adatbázis csak a fáljnevet tárolja
 app.use("/images", express.static("./images"));
-// GET profile nincs meg (Kész)
-// PUT profile nincs meg (Kész) (Frontendbe be kell építeni őket)
 
-// GET categories nincs meg (Adminhoz kell)
+
 // GET orders/my nincs meg
 // POST contact nincs mmeg. (Contact html oldalhoz kell) (Ellenőrizni kell, hogy az email cím igazinak tűnik-e illetve anti spamesnek kellene lennie)
 
+//GET és POST contact kész (Get admin rész)
+// GET, POST és PUT categories kész (admin rész)
+// GET és PUT profile kész (auth rész)
+
+// GET users és profile kész (admin rész3)
+
+//A termékek száma nem frissül hiába adunk le rendelést
+//A termékek ára nem backendben számolódik ki == simán hackelhető
 
 // Ha leadunk egy rendelést akkor nem adja hozzá a profilhoz az adatainkat amit felhasználunk (Nincs profile)
 // Ha be vagyunk jelentkezve rá tudunk menni al ogin és register oldalra is.

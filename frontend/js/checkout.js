@@ -92,7 +92,7 @@ if (window.location.pathname.includes("checkout.html")) {
             try {
                 // Az új backend más adatszerkezetet vár: meglévő nevet és árat is el kell küldeni
                 const orderData = {
-                    user_email: email,
+                    email: email,
                     total_price: updateCheckoutTotal(), // kiszámoljuk a végösszeget
                     items: cart.map(item => ({
                         id: item.id,
@@ -107,7 +107,7 @@ if (window.location.pathname.includes("checkout.html")) {
                     method: 'POST',
                     body: JSON.stringify(orderData)
                 });
-
+                
                 showToast("Rendelés sikeresen leadva!");
                 localStorage.removeItem("cart"); // Kosár ürítése
                 setTimeout(() => {
