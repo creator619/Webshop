@@ -41,49 +41,102 @@ router.post("/", optionalAuth, (req, res) => {
     });
     }
 
-    db.serialize(() => {
-            db.exec("BEGIN TRANSACTION");
+    // készlet ellenőrzés
 
-            const stmt = db.prepare(`
-                INSERT INTO orders (user_id, user_email, guest_email, total_price) 
-                VALUES (?, ?, ?, ?)
-            `);
+     const checkStockPromises = items.map(item => {
+        return new Promise((resolve, reject) => {
+            const qty = item.quantity || 1;
 
-            stmt.run(user_id, user_email, guest_email, total_price, function (err) {
-                if (err) {
-                     db.exec("ROLLBACK");
-                    return res.status(500).json({ message: "Hiba a rendelés mentésekor.", error: err.message });
+            db.get(
+                "SELECT stock FROM product_stock WHERE product_id = ? AND size = ?",
+                [item.id, item.size],
+                (err, row) => {
+                    if (err) {
+                        return reject(new Error("Adatbázis hiba a készlet ellenőrzésekor."));
+                    }
+
+                    if (!row) {
+                        return reject(new Error(`${item.name} (${item.size}) nem található.`));
+                    }
+
+                    if (row.stock < qty) {
+                        return reject(new Error(`Nincs elég készlet: ${item.name} (${item.size}) - elérhető: ${row.stock}`));
+                    }
+
+                    resolve(true);
                 }
-
-            const orderId = this.lastID; // Az új rendelés ID-ja
-
-             // 2. Tételek beszúrása
-            const itemStmt = db.prepare(`
-                INSERT INTO order_items (order_id, product_name, price, quantity) 
-                VALUES (?, ?, ?, ?)
-                `);
-
-            items.forEach(item => {
-                // Quantity-t most 1-nek vesszük, mert a frontend nem kezel mennyiséget külön (még)
-                itemStmt.run(orderId, item.name, item.price, 1);
-            });
-
-            db.exec("COMMIT", (commitErr) => {
-                if (commitErr) {
-                    db.exec("ROLLBACK");
-                    return res.status(500).json({ message: "Hiba a rendelés véglegesítésekor." });
-                }
-
-                stmt.finalize();
-                itemStmt.finalize();
-
-                res.status(201).json({ 
-                    message: "Rendelés sikeresen leadva!", 
-                    orderId: orderId 
-                });
-            });
+            );
         });
     });
+
+    Promise.all(checkStockPromises)
+        .then(() => {
+
+            db.serialize(() => {
+                db.exec("BEGIN TRANSACTION");
+
+                // 🧾 2. Rendelés mentése
+                const stmt = db.prepare(`
+                    INSERT INTO orders (user_id, user_email, guest_email, total_price) 
+                    VALUES (?, ?, ?, ?)
+                `);
+
+                stmt.run(user_id, user_email, guest_email, total_price, function (err) {
+                    if (err) {
+                        db.exec("ROLLBACK");
+                        return res.status(500).json({
+                            message: "Hiba a rendelés mentésekor.",
+                            error: err.message
+                        });
+                    }
+
+                    const orderId = this.lastID;
+
+                    // 📦 3. Tételek + készlet csökkentés
+                    const itemStmt = db.prepare(`
+                        INSERT INTO order_items (order_id, product_name, price, quantity) 
+                        VALUES (?, ?, ?, ?)
+                    `);
+
+                    const stockStmt = db.prepare(`
+                        UPDATE product_stock 
+                        SET stock = stock - ? 
+                        WHERE product_id = ? AND size = ?
+                    `);
+
+                    for (const item of items) {
+                        const qty = item.quantity || 1;
+
+                        itemStmt.run(orderId, item.name, item.price, qty);
+                        stockStmt.run(qty, item.id, item.size);
+                    }
+
+                    // ✅ COMMIT
+                    db.exec("COMMIT", (commitErr) => {
+                        if (commitErr) {
+                            db.exec("ROLLBACK");
+                            return res.status(500).json({
+                                message: "Hiba a rendelés véglegesítésekor."
+                            });
+                        }
+
+                        stmt.finalize();
+                        itemStmt.finalize();
+                        stockStmt.finalize();
+
+                        res.status(201).json({
+                            message: "Rendelés sikeresen leadva!",
+                            orderId: orderId
+                        });
+                    });
+                });
+            });
+        })
+        .catch(err => {
+            return res.status(400).json({
+                message: err.message
+            });
+        });
 });
 
 router.get("/", authMiddleware, (req, res) => {
