@@ -1,5 +1,3 @@
-node_modules/
-backend/
 .env
 *.sqlite
 .DS_Store
