@@ -231,7 +231,12 @@ document.addEventListener("DOMContentLoaded", () => {
             // Valódi backend kérés
             apiFetch('/contact', {
                 method: 'POST',
-                body: JSON.stringify({ name, email, subject, message })
+                body: JSON.stringify({
+                    name: name, 
+                    email: email, 
+                    category_id: subject, 
+                    message: message
+                })
             })
             .then(() => {
                 contactForm.reset();

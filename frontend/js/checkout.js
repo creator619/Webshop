@@ -81,10 +81,12 @@ if (window.location.pathname.includes("/checkout")) {
             const email = document.getElementById("email").value;
             const phone = document.getElementById("phone").value;
             const address = document.getElementById("address").value;
+            const zip = document.getElementById("zip").value;
+            const city = document.getElementById("city").value;
             const shippingMethod = document.querySelector('input[name="shipping"]:checked')?.value || 'home';
             const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || 'cod';
 
-            if (!name || !email || !phone || !address) {
+            if (!name || !email || !phone || !address || !zip || !city) {
                 showToast("Kérlek tölts ki minden mezőt!");
                 return;
             }
@@ -92,7 +94,12 @@ if (window.location.pathname.includes("/checkout")) {
             try {
                 // Az új backend más adatszerkezetet vár: meglévő nevet és árat is el kell küldeni
                 const orderData = {
+                    name: name,
                     email: email,
+                    phone: phone,
+                    address: address,
+                    zip: zip,
+                    city: city,
                     total_price: updateCheckoutTotal(), // kiszámoljuk a végösszeget
                     items: cart.map(item => ({
                         id: item.id,
@@ -120,3 +127,32 @@ if (window.location.pathname.includes("/checkout")) {
         });
     }
 }
+
+async function loadCheckoutProfile() {
+    try {
+        const data = await apiFetch('/auth/profile');
+
+        if (!data) return;
+
+        if (data.phone && document.getElementById("phone")) {
+            document.getElementById("phone").value = data.phone;
+        }
+
+        if (data.zip && document.getElementById("zip")) {
+            document.getElementById("zip").value = data.zip;
+        }
+
+        if (data.city && document.getElementById("city")) {
+            document.getElementById("city").value = data.city;
+        }
+
+        if (data.address && document.getElementById("address")) {
+            document.getElementById("address").value = data.address;
+        }
+
+    } catch (err) {
+        console.error("Profil betöltés hiba:", err);
+    }
+}
+
+loadCheckoutProfile();

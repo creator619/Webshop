@@ -23,11 +23,13 @@ router.post("/", optionalAuth, (req, res) => {
     const { name, email, category_id, message } = req.body;
 
     if (!name || !email || !category_id || !message ) {
+        console.log("első hiba");
         return res.status(400).json({
             message: "Minden mező kitöltése kötelező!"
         });
     }
     if (email.length > 100 || name.length > 100) {
+        console.log("masodik hiba");
         return res.status(400).json({ 
             message: "Az email és/vagy a név túl hosszú!"
         });

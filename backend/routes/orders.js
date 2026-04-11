@@ -19,19 +19,32 @@ router.post("/", optionalAuth, (req, res) => {
         // vendég
         guest_email = req.body.email;
 
-        if (!guest_email) {
+        if (!guest_email || guest_email.includes("@")) {
+            console.log("hibácska");
             return res.status(400).json({
                 message: "Vendég rendeléshez email kötelező!"
             });
         }
     }
 
-    const { items } = req.body;
+    const { items, name, phone, address, city, zip } = req.body;
 
     if (!items || items.length === 0) {
+        console.log("első elötti hiba");
         return res.status(400).json({
-            message: "Hiányzó kosár tartalom."
+            message: "Hiányzó kosár tartalom."  
         });
+    }
+
+    // validáció
+
+    if (!name || !phone || !address || !city || !zip) {
+        console.log("első hiba");
+        return res.status(400).send("Hiányzó adatok!");
+    }
+    if (phone.length < 6) {
+        console.log("masodik hiba");
+        return res.status(400).send("Nem megfelelő telefonszám!");
     }
 
     // 🔹 1. Termékek lekérése DB-ből (név + ár)
@@ -103,11 +116,11 @@ router.post("/", optionalAuth, (req, res) => {
                 db.exec("BEGIN TRANSACTION");
 
                 const orderStmt = db.prepare(`
-                    INSERT INTO orders (user_id, user_email, guest_email, total_price)
-                    VALUES (?, ?, ?, ?)
+                    INSERT INTO orders (user_id, user_email, guest_email, total_price, shipping_name, shipping_phone, shipping_address, shipping_city, shipping_zip)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 `);
 
-                orderStmt.run(user_id, user_email, guest_email, total_price, function (err) {
+                orderStmt.run(user_id, user_email, guest_email, total_price, name, phone, address, city, zip, function (err) {
                     if (err) {
                         db.exec("ROLLBACK");
                         return res.status(500).json({
@@ -120,8 +133,8 @@ router.post("/", optionalAuth, (req, res) => {
 
                     // 📦 3. Tételek + készlet csökkentés
                     const itemStmt = db.prepare(`
-                        INSERT INTO order_items (order_id, product_name, price, quantity)
-                        VALUES (?, ?, ?, ?)
+                        INSERT INTO order_items (order_id, product_name, price, quantity, size)
+                        VALUES (?, ?, ?, ?, ?)
                     `);
 
                     const stockStmt = db.prepare(`
@@ -131,7 +144,7 @@ router.post("/", optionalAuth, (req, res) => {
                     `);
 
                     for (const item of validItems) {
-                        itemStmt.run(orderId, item.name, item.price, item.quantity);
+                        itemStmt.run(orderId, item.name, item.price, item.quantity, item.size);
                         stockStmt.run(item.quantity, item.id, item.size);
                     }
 
@@ -157,6 +170,7 @@ router.post("/", optionalAuth, (req, res) => {
             });
         })
         .catch(err => {
+            console.log("harmadik hiba");
             return res.status(400).json({
                 message: err.message
             });

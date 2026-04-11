@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadOrders();       // Rendelések
         loadProducts();     // Termékek
         loadCategoriesAdmin(); // Kategóriák
+        loadMessages(); // Üzenetek
         setupTabs();        // Fülek közötti navigáció beállítása
         
         // Megjegyzés: Az új backend nem támogatja a külön statisztika és üzenet funkciókat, 
@@ -142,11 +143,11 @@ async function loadOrders() {
                 <tr>
                     <td>#${o.id}</td>
                     <td>
-                        <b>${o.customer_name || 'Ismeretlen'}</b><br>
-                        <span style="font-size: 0.85rem; color: #555;">${o.user_email}</span><br>
+                        <b>${o.shipping_name || 'Ismeretlen'}</b><br>
+                        <span style="font-size: 0.85rem; color: #555;">${o.user_email || o.guest_email}</span><br>
                         <div style="font-size: 0.85rem; color: #777; margin-top: 3px;">
-                            📞 ${o.customer_phone || '-'}<br>
-                            🏠 ${o.customer_address || '-'}
+                            📞 ${o.shipping_phone || '-'}<br>
+                            🏠 ${o.shipping_zip + " " + o.shipping_city + " " + o.shipping_address || '-'}
                         </div>
                         <div class="order-items-detail" style="margin-top: 5px; border-top: 1px solid #eee; pt-2;">
                             ${itemsHtml}
@@ -385,7 +386,8 @@ async function deleteProduct(id) {
 // --- ÜZENETEK: Ügyfél üzenetek listázása és kezelése ---
 async function loadMessages() {
     try {
-        const messages = await apiFetch('/admin/messages');
+        const messages = await apiFetch('/admin/contact');
+        console.log(messages);
         const tbody = document.getElementById('messages-table-body');
         if (!tbody) return;
 
@@ -402,7 +404,7 @@ async function loadMessages() {
                     <td style="font-size: 0.85rem; color: #666;">${date}</td>
                     <td>${m.name}</td>
                     <td><a href="mailto:${m.email}" style="color: var(--accent);">${m.email}</a></td>
-                    <td style="font-weight: 600;">${m.subject || '-'}</td>
+                    <td style="font-weight: 600;">${m.category.name || '-'}</td>
                     <td style="max-width: 300px; font-size: 0.9rem; color: #444;">${m.message}</td>
                     <td>
                         <button class="action-btn" onclick="deleteMessage(${m.id})" title="Üzenet törlése">🗑️</button>

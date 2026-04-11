@@ -84,7 +84,12 @@ function initDb() {
             guest_email TEXT NULL,
             total_price INTEGER,
             status TEXT DEFAULT 'pending',
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            shipping_name TEXT,
+            shipping_phone TEXT,
+            shipping_address TEXT,
+            shipping_city TEXT,
+            shipping_zip TEXT
         )`);
 
             // Order Items tábla
@@ -94,6 +99,7 @@ function initDb() {
             product_name TEXT,
             price INTEGER,
             quantity INTEGER,
+            size TEXT,
             FOREIGN KEY(order_id) REFERENCES orders(id)
         )`);
 

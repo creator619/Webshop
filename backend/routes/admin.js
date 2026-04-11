@@ -10,7 +10,6 @@ const sqlite3 = require('sqlite3').verbose();
 
 const authMiddleware = require("../Middleware/authMiddleware");
 const adminMiddleware = require("../Middleware/adminMiddleware");
-
 // törölni 
 
 // Összekötni a product adatokat a backendel, hogy az admin tudja szerkezteni akár az ár értékét
@@ -26,8 +25,19 @@ const adminMiddleware = require("../Middleware/adminMiddleware");
 
 // Nekem testek törölhetőek, ha kell maradhat
 
+
+router.get("/rendeles", authMiddleware, (req, res) => {
+    db.run("ALTER TABLE orders ADD COLUMN shipping_zip TEXT;", [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({ success: true });
+    });
+});
+
 router.get("/useradat", authMiddleware, (req, res) => {
-    db.all("SELECT * FROM users", [], (err, rows) => {
+    db.all("SELECT * FROM orders", [], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -110,12 +120,21 @@ router.post("/test1", authMiddleware, (req, res) => {
 
 router.get("/orders/", authMiddleware, adminMiddleware, (req, res) => {
 
-    db.all("SELECT * FROM orders", [], (err, rows) => {
+ db.all("SELECT * FROM orders", [], (err, orders) => {
+    if (err) return res.status(500).json({ error: err.message });
 
-        if (err) {
-            res.status(500).json({ error: err.message})
-        }
-        res.json(rows);
+    db.all("SELECT * FROM order_items", [], (err2, items) => {
+        if (err2) return res.status(500).json({ error: err2.message });
+
+        const result = orders.map(order => {
+            return {
+                ...order,
+                order_items: items.filter(i => i.order_id === order.id)
+            };
+        });
+
+        res.json(result);
+      });
     });
 });
 
@@ -313,12 +332,21 @@ router.put("/categories", authMiddleware, adminMiddleware, (req, res) => {
 
 router.get("/contact", authMiddleware, adminMiddleware, (req, res) => {
    
-   db.all("SELECT * FROM contact", [], (err, rows) => {
-    
-    if (err) {
-        return res.status(500).json( { message: "Hiba" });
-    }
-    res.json(rows);
+ db.all("SELECT * FROM contact", [], (err, contacts) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    db.all("SELECT * FROM category", [], (err2, categories) => {
+        if (err2) return res.status(500).json({ error: err2.message });
+
+        const result = contacts.map(contact => {
+            return {
+                ...contact,
+                category: categories.find(c => c.id === contact.category_id) || null 
+            };
+        });
+
+        res.json(result);
+      });
     });
 });
 
