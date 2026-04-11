@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Webshop</title>
-    <link rel="stylesheet" href="css/common.css?v=11">
-    <link rel="stylesheet" href="css/admin.css?v=11">
+    <link rel="stylesheet" href="/static/css/common.css?v=11">
+    <link rel="stylesheet" href="/static/css/admin.css?v=11">
     <!-- Chart.js a grafikonokhoz -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -18,7 +18,7 @@
         <div class="tab" data-tab="products">Termékek</div>
         <div class="tab" data-tab="messages">Üzenetek</div>
                 <div id="user-nav" class="user-status"></div>
-                <button onclick="window.location.href='index.html'" class="btn-add" style="background: #333;">Vissza a bolthoz</button>
+                <button onclick="window.location.href='/'" class="btn-add" style="background: #333;">Vissza a bolthoz</button>
     </div>
 
     <div class="admin-container">
@@ -166,7 +166,7 @@
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Szükséges szkriptek -->
-    <script src="js/common.js"></script>
-    <script src="js/admin.js?v=10"></script>
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/admin.js?v=10"></script>
 </body>
 </html>

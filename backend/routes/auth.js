@@ -4,6 +4,7 @@ const db = require("../db/database"); // SQLite connection
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../Middleware/authMiddleware");
+const { message } = require("statuses");
 
 // REGISZTRÁCIÓ
 router.post("/register", async (req, res) => {
@@ -125,6 +126,19 @@ router.get("/profile", authMiddleware, (req, res) => {
 router.put("/profile", authMiddleware, (req, res) => {
     const userId = req.user.id;
     const { phone, zip, city, address } = req.body;
+
+    console.log(userId, phone, zip, city, address);
+    if (!userId) {
+         return res.status(400).json({
+            message: "Nincs bejelentkezett felhasználó!"
+        });
+    }
+    
+    if (!phone || !zip || !city || !address) {
+        return res.status(400).json({
+            message: "Minden mező kitöltése kötelező!"
+        });
+    }
 
     db.run(`
         INSERT INTO user_profiles (user_id, phone, zip, city, address)

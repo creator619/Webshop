@@ -4,7 +4,7 @@
 
 // A globális kosárkezelő függvények (addToCart, updateCartCount) már a common.js-ben vannak.
 
-if (window.location.pathname.includes("cart.html")) {
+if (window.location.pathname.includes("/cart")) {
     renderCart();
 }
 
@@ -79,7 +79,7 @@ function renderCart() {
                 showToast("A kosár üres!");
                 return;
             }
-            window.location.href = "checkout.html";
+            window.location.href = "/checkout";
         });
     }
 }
@@ -104,7 +104,7 @@ function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     cart.splice(index, 1);
     localStorage.setItem("cart", JSON.stringify(cart));
-    if (window.location.pathname.includes("cart.html")) {
+    if (window.location.pathname.includes("/cart")) {
         renderCart();
     } else {
         location.reload();

@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ügyfélszolgálat & Kapcsolat - Ruházati Webshop</title>
-    <link rel="stylesheet" href="css/common.css?v=11">
-    <link rel="stylesheet" href="css/contact.css?v=11">
+    <link rel="stylesheet" href="/static/css/common.css?v=11">
+    <link rel="stylesheet" href="/static/css/contact.css?v=11">
 </head>
 
 <body>
@@ -28,12 +28,12 @@
     <nav class="menu">
         <button class="mobile-menu-toggle" id="mobile-menu-toggle">☰</button>
         <ul id="main-menu">
-            <li onclick="window.location.href='index.html'">Főoldal</li>
+            <li onclick="window.location.href='/'">Főoldal</li>
             <li data-category="1">Ing</li>
             <li data-category="2">Zakó</li>
             <li data-category="3">Nadrág</li>
             <li data-category="4">Cipő</li>
-            <li onclick="window.location.href='cart.html'" class="cart-menu">
+            <li onclick="window.location.href='/cart'" class="cart-menu">
                 Kosár <span id="cart-count">(0)</span>
             </li>
             <div id="user-nav" class="user-status"></div>
@@ -131,21 +131,21 @@
             <div class="footer-section">
                 <h4>Gyors Linkek</h4>
                 <ul>
-                    <li><a href="index.html">Főoldal</a></li>
-                    <li><a href="cart.html">Kosár</a></li>
-                    <li><a href="login.html">Bejelentkezés</a></li>
-                    <li><a href="register.html">Regisztráció</a></li>
+                    <li><a href="/">Főoldal</a></li>
+                    <li><a href="/cart">Kosár</a></li>
+                    <li><a href="/login">Bejelentkezés</a></li>
+                    <li><a href="/register">Regisztráció</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h4>Ügyfélszolgálat</h4>
                 <ul>
-                    <li><a href="contact.html">Szállítási információk</a></li>
-                    <li><a href="contact.html">Gyakori kérdések</a></li>
-                    <li><a href="contact.html">Visszaküldés</a></li>
-                    <li><a href="login.html">Bejelentkezés</a></li>
-                    <li><a href="register.html">Regisztráció</a></li>
-                    <li><a href="contact.html">Kapcsolatfelvétel</a></li>
+                    <li><a href="/contact">Szállítási információk</a></li>
+                    <li><a href="/contact">Gyakori kérdések</a></li>
+                    <li><a href="/contact">Visszaküldés</a></li>
+                    <li><a href="/login">Bejelentkezés</a></li>
+                    <li><a href="/register">Regisztráció</a></li>
+                    <li><a href="/contact">Kapcsolatfelvétel</a></li>
                 </ul>
             </div>
             <!-- Elérhetőségek -->
@@ -164,8 +164,8 @@
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Közös scriptek (tartalmazza a contact.js logikát is) -->
-    <script src="js/products_data.js?v=11"></script>
-    <script src="js/common.js?v=11"></script>
+    <script src="/static/js/products_data.js?v=11"></script>
+    <script src="/static/js/common.js?v=11"></script>
 </body>
 </html>
 

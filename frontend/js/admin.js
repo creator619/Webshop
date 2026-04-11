@@ -2,13 +2,19 @@
 let categoryChartInstance = null;
 let revenueChartInstance = null;
 
+const user = JSON.parse(localStorage.getItem("user"));
+
+if (!user || user.role !== "admin") {
+    window.location.href="/";
+}
+
 // Az oldal betöltésekor lefutó fő inicializáló rész
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Alapszintű ellenőrzés a localStorage-ból (gyors visszajelzés)
     const user = JSON.parse(localStorage.getItem('user'));
     
     if (!user) {
-        window.location.href = 'login.html';
+        window.location.href = '/login';
         return;
     }
 
@@ -16,6 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         let profile;
         try {
+            //Ennek mi a feladata?
             profile = await apiFetch('/profile');
         } catch (apiErr) {
             console.warn("Profil API nem érhető el, LocalStorage használata:", apiErr.message);
@@ -45,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Ha nem vagyunk bejelentkezve vagy nincs jogunk, irányítsunk vissza
         if (err.message.includes("jogosultság") || err.message.includes("not defined")) {
-            window.location.href = 'index.html';
+            window.location.href = '/';
         }
     }
 });
@@ -74,8 +81,8 @@ function setupTabs() {
 // Kategóriák betöltése a backendről a termék felvételi legördülő menübe
 async function loadCategoriesAdmin() {
     try {
-        const categories = await apiFetch('/categories');
-
+        const categories = await apiFetch('/admin/categories');
+        //lekéri a categories adatokat, de nem írja ki sehol
         const select = document.getElementById('p-category');
         if (select) {
             select.innerHTML = '<option value="">Válassz kategóriát...</option>';

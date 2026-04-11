@@ -2,7 +2,7 @@
 // PÉNZTÁR ÉS RENDELÉS LEADÁSA
 // ==========================================
 
-if (window.location.pathname.includes("checkout.html")) {
+if (window.location.pathname.includes("/checkout")) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     const container = document.getElementById("checkout-items");
     let total = 0;
@@ -111,7 +111,7 @@ if (window.location.pathname.includes("checkout.html")) {
                 showToast("Rendelés sikeresen leadva!");
                 localStorage.removeItem("cart"); // Kosár ürítése
                 setTimeout(() => {
-                    window.location.href = `order-success.html?id=${result.id}`;
+                    window.location.href = `/order-success?id=${result.id}`;
                 }, 1500);
             } catch (err) {
                 console.error(err);

@@ -36,6 +36,46 @@ router.get("/useradat", authMiddleware, (req, res) => {
     });
 });
 
+router.get("/categoriateszt", (req, res) => {
+    const name = "Rendeléssel kapcsolatos kérdés";
+    const name2 = "Szállításról érdeklődnék";
+    const name3 = "Termék visszaküldése";
+    const name4 = "Egyéb";
+
+    const sql = `
+        INSERT INTO category (name)
+        VALUES (?)
+    `;
+    db.run(sql, [name], function(err) {
+
+        if (err) {
+            return res.status(500).json({ message: "hiba" });
+        }
+        db.run(sql, [name2], function(err) {
+
+        if (err) {
+            return res.status(500).json({ message: "hiba" });
+        }
+            db.run(sql, [name3], function(err) {
+
+            if (err) {
+             return res.status(500).json({ message: "hiba" });
+            }
+                db.run(sql, [name4], function(err) {
+
+                if (err) {
+                 return res.status(500).json({ message: "hiba" });
+                }
+              res.json({
+                 success: true,
+                 message:"Kategória sikeresen hozzáadva!"
+                });
+              });
+            });
+        });
+    });
+});
+
 router.get("/test", authMiddleware, adminMiddleware, (req, res) => {
     db.all("SELECT * FROM user_profiles", [], (err, rows) => {
         if (err) {

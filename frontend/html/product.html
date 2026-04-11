@@ -3,8 +3,8 @@
 
 <head>
     <title>Termék részletek</title>
-    <link rel="stylesheet" href="css/common.css?v=11">
-    <link rel="stylesheet" href="css/product.css?v=11">
+    <link rel="stylesheet" href="/static/css/common.css?v=11">
+    <link rel="stylesheet" href="/static/css/product.css?v=11">
 </head>
 
 <body>
@@ -13,9 +13,9 @@
     <nav class="menu">
         <button class="mobile-menu-toggle" id="mobile-menu-toggle">☰</button>
         <ul id="main-menu">
-            <li onclick="window.location.href='index.html'">Főoldal</li>
+            <li><a href="/">Főoldal</a></li>
             <!-- Kosár ikon és tartalom számláló -->
-            <li onclick="window.location.href='cart.html'" class="cart-menu">
+            <li onclick="window.location.href='/cart'" class="cart-menu">
                 Kosár <span id="cart-count">(0)</span>
             </li>
             <!-- Felhasználói profil/bejelentkezés állapot helye -->
@@ -80,19 +80,19 @@
             <div class="footer-section">
                 <h4>Gyors Linkek</h4>
                 <ul>
-                    <li><a href="index.html">Főoldal</a></li>
-                    <li><a href="cart.html">Kosár</a></li>
-                    <li><a href="login.html">Bejelentkezés</a></li>
-                    <li><a href="register.html">Regisztráció</a></li>
+                    <li><a href="/index">Főoldal</a></li>
+                    <li><a href="/cart">Kosár</a></li>
+                    <li><a href="/login">Bejelentkezés</a></li>
+                    <li><a href="/register">Regisztráció</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h4>Ügyfélszolgálat</h4>
                 <ul>
-                    <li><a href="contact.html">Szállítási információk</a></li>
-                    <li><a href="contact.html">Gyakori kérdések</a></li>
-                    <li><a href="contact.html">Visszaküldés</a></li>
-                    <li><a href="contact.html">Kapcsolatfelvétel</a></li>
+                    <li><a href="/contact">Szállítási információk</a></li>
+                    <li><a href="/contact">Gyakori kérdések</a></li>
+                    <li><a href="/contact">Visszaküldés</a></li>
+                    <li><a href="/contact">Kapcsolatfelvétel</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -110,9 +110,9 @@
     <!-- Értesítések helye -->
     <div id="toast-container" class="toast-container"></div>
 
-    <script src="js/products_data.js?v=1.1"></script>
-    <script src="js/common.js?v=11"></script>
-    <script src="js/product.js?v=2"></script>
+    <script src="/static/js/products_data.js?v=1.1"></script>
+    <script src="/static/js/common.js?v=11"></script>
+    <script src="/static/js/product.js?v=2"></script>
 </body>
 </html>
 

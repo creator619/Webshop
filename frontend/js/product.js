@@ -2,7 +2,7 @@
 // TERMÉK RÉSZLETEK ÉS HASONLÓ TERMÉKEK
 // ==========================================
 
-if (window.location.pathname.includes("product.html")) {
+if (window.location.pathname.includes("/product")) {
     let product = JSON.parse(localStorage.getItem("selectedProduct"));
 
     if (product) {

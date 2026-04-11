@@ -1,5 +1,11 @@
+// Átirányítás
+
+if (localStorage.getItem("user")) {
+    window.location.href="/";
+}
+
 // Bejelentkezés logikája
-if (window.location.pathname.includes("login.html")) {
+if (window.location.pathname.includes("/login")) {
     const loginBtn = document.getElementById("login-btn");
     if (loginBtn) {
         loginBtn.addEventListener("click", async () => {
@@ -32,7 +38,7 @@ if (window.location.pathname.includes("login.html")) {
                 showToast("Sikeres bejelentkezés!");
                 setTimeout(() => {
                     const isAdmin = data.user.role === 'admin' || data.user.is_admin;
-                    window.location.href = isAdmin ? "admin.html" : "index.html";
+                    window.location.href = isAdmin ? "/admin" : "/";
                 }, 1000);
             } catch (error) {
                 showToast(error.message || "Hibás email vagy jelszó!");

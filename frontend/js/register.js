@@ -1,5 +1,13 @@
+// Átirányítás
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+if (user) {
+    window.location.href="/";
+}
+
 // Regisztráció logikája
-if (window.location.pathname.includes("register.html")) {
+if (window.location.pathname.includes("/register")) {
     const regBtn = document.getElementById("register-btn");
     if (regBtn) {
         regBtn.addEventListener("click", async () => {
@@ -28,7 +36,7 @@ if (window.location.pathname.includes("register.html")) {
 
                 showToast("Regisztráció sikeres! Most már bejelentkezhetsz.");
                 setTimeout(() => {
-                    window.location.href = "login.html";
+                    window.location.href = "/login";
                 }, 1500);
             } catch (error) {
                 showToast(error.message || "Hiba a regisztráció során!");

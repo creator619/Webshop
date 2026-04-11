@@ -2,37 +2,17 @@
 // PROFIL ADATOK ÉS RENDELÉSI ELŐZMÉNYEK
 // ==========================================
 
-if (window.location.pathname.includes('profile.html')) {
+if (window.location.pathname.includes('/profile')) {
+
     const user = JSON.parse(localStorage.getItem('user'));
 
     if (!user) {
         showToast('Kérlek jelentkezz be a profilod megtekintéséhez!');
         setTimeout(() => {
-            window.location.href = 'login.html';
+            window.location.href = '/login';
         }, 1500);
     } else {
-        // UI feltöltése a tárolt profil adatokkal
-        const detailsCard = document.getElementById('user-details-card');
-        if (detailsCard) {
-            detailsCard.innerHTML = `
-                <div class="user-data-item">
-                    <strong>Név</strong>
-                    <span>${user.name}</span>
-                </div>
-                <div class="user-data-item">
-                    <strong>E-mail cím</strong>
-                    <span>${user.email}</span>
-                </div>
-                <div class="user-data-item">
-                    <strong>Telefonszám</strong>
-                    <span>${user.phone || "<i>Nincs megadva</i>"}</span>
-                </div>
-                <div class="user-data-item">
-                    <strong>Szállítási cím</strong>
-                    <span>${user.address || "<i>Nincs megadva</i>"}</span>
-                </div>
-            `;
-        }
+        loadUserProfile();
 
         // Szerkesztés gomb eseménykezelő
         const editBtn = document.getElementById('edit-profile-btn');
@@ -103,10 +83,58 @@ function toggleEditForm(show) {
         document.getElementById('edit-name').value = user.name;
         document.getElementById('edit-phone').value = user.phone || "";
         document.getElementById('edit-address').value = user.address || "";
+        document.getElementById('edit-zip').value = user.zip || "";
+        document.getElementById('edit-city').value = user.city || "";
         form.style.display = 'block';
         window.scrollTo({ top: form.offsetTop - 100, behavior: 'smooth' });
     } else {
         form.style.display = 'none';
+    }
+}
+
+// Profiladatok betöltése:
+
+async function loadUserProfile() {
+    try {
+        const data = await apiFetch('/auth/profile');
+
+        const detailsCard = document.getElementById('user-details-card');
+
+        if (detailsCard) {
+            detailsCard.innerHTML = `
+                <div class="user-data-item">
+                    <strong>Név</strong>
+                    <span>${data.name}</span>
+                </div>
+                <div class="user-data-item">
+                    <strong>E-mail cím</strong>
+                    <span>${data.email}</span>
+                </div>
+                <div class="user-data-item">
+                    <strong>Telefonszám</strong>
+                    <span>${data.phone || "<i>Nincs megadva</i>"}</span>
+                </div>
+                <div class="user-data-item">
+                    <strong>Szállítási cím</strong>
+                    <span>
+                        ${
+                            data.zip && data.city && data.address
+                                ? `${data.zip}, ${data.city}, ${data.address}`
+                                : "<i>Nincs megadva</i>"
+                        }
+                    </span>
+                </div>
+            `;
+        }
+
+        // 👉 ELTESSZÜK localStorage-be is (frissítjük)
+        const user = JSON.parse(localStorage.getItem("user")) || {};
+        const updatedUser = { ...user, ...data };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    } catch (err) {
+        console.error(err);
+        showToast("Hiba a profil betöltésekor!");
     }
 }
 
@@ -120,16 +148,23 @@ async function saveProfileChanges() {
     const updatedData = {
         name: document.getElementById('edit-name').value,
         phone: document.getElementById('edit-phone').value,
+        zip: document.getElementById('edit-zip').value,
+        city: document.getElementById('edit-city').value,
         address: document.getElementById('edit-address').value
     };
 
+    // Irányítószám validáció
+    if (!/^\d{4}$/.test(updatedData.zip)) {
+        showToast("Hibás irányítószám!");
+        return;
+    }
     if (!updatedData.name) {
         showToast("A név megadása kötelező!");
         return;
     }
 
     try {
-        const profile = await apiFetch('/profile', {
+        const profile = await apiFetch('/auth/profile', {
             method: 'PUT',
             body: JSON.stringify(updatedData)
         });

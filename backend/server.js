@@ -44,7 +44,7 @@ app.use(cors({
     origin: "http://${LOCAL_IP}:${PORT}" // frontend címe
 }));
 app.use(express.json());
-app.use(express.static("../frontend"));
+app.use("/static", express.static("../frontend"));
 
 // Statikus fájlok kiszolgálása (pl. képek a frontend mappából, ha szükséges, de itt frontend külön van)
 // Mivel a frontend a gyökérben van és a backend külön, most csak az API-t csináljuk.
@@ -60,28 +60,32 @@ app.use(express.static("../frontend"));
 app.use("/auth", limiter, require("./routes/auth"));
 app.use("/products", limiter, require("./routes/products"));
 app.use("/orders", limiter, require("./routes/orders"));
+app.use("/contact", limiter, require("./routes/contact"));
 app.use("/admin", require("./routes/admin"));
 //A képfájlokat a backend statikus kiszolgálással (Express static middleware) szolgálja ki, az adatbázis csak a fáljnevet tárolja
 app.use("/images", express.static("./images"));
+app.use("/", limiter, require("./routes/pages"))
 
 
-// GET orders/my nincs meg
-// POST contact nincs mmeg. (Contact html oldalhoz kell) (Ellenőrizni kell, hogy az email cím igazinak tűnik-e illetve anti spamesnek kellene lennie)
 
-//GET és POST contact kész (Get admin rész)
-// GET, POST és PUT categories kész (admin rész)
+//GET és POST contact kész (Get adminban van) (FRONTEND RÁKÖTNI)
+// GET, POST és PUT categories kész (admin rész) (FRONTEND RÁKÖTNI)
 // GET és PUT profile kész (auth rész)
+// GET orders/my (KÉSZ) (FRONTEND RÁKÖTNI)
 
 // GET users és profile kész (admin rész3)
 
-//A termékek száma nem frissül hiába adunk le rendelést
+//FRONTEND profilban amikor fetch put-oljuk a user cím adatait, nem megfelelően menti el az sql-be. (Frontend rosszul küld adat)
+//FRONTEND profilban nem kéri le az adatokat, amit elmentünk sql-ben.
+
+//A termékek száma nem frissül hiába adunk le rendelést 
 //A termékek ára nem backendben számolódik ki == simán hackelhető
 
 // Ha leadunk egy rendelést akkor nem adja hozzá a profilhoz az adatainkat amit felhasználunk (Nincs profile)
 // Ha be vagyunk jelentkezve rá tudunk menni al ogin és register oldalra is.
-//Ha egy terméknek lockolva van a mennyisége az nem számít lehet többet is rendelni belőle
-//Ha manuálisan átírjuk, hogy 10 helyett 11 inget akarunk, akkor kiírja, hogy csak 10 van és be rakja a kosárba.
-//Nem enged többet be rakni a kosárba, viszont ha a kosárban vagyunk akkor a plusz jelecskével tudunk még hozzáadni
+
+
+//Nem enged többet be rakni a kosárba, viszont ha a kosárban vagyunk akkor a plusz jelecskével tudunk még hozzáadni (STILL WORKING)
 // keress termékre résznél a nagyító bele log a szövegbe.
 //keresés funkció a fő oldalon nem működik.
 //Visszaküldés a contact oldalra visznek (Ha ez tervezett működés akkor nincs probléma)
@@ -89,9 +93,6 @@ app.use("/images", express.static("./images"));
 
 //rendelés leadása után a rendelési azonosító undefined
 
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend/html/index.html"));
-});
 app.get("/:page", (req, res) => {
     const page = req.params.page;
     res.sendFile(path.join(__dirname, `../frontend/html/${page}`));
@@ -100,4 +101,5 @@ app.get("/:page", (req, res) => {
 //app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 app.listen(PORT, LOCAL_IP, () => {
     console.log(`Server running on http://${LOCAL_IP}:${PORT}`);
+    console.log(path.join(__dirname, "../frontend/html"));
 });

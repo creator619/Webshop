@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kosár</title>
-    <link rel="stylesheet" href="css/common.css?v=11">
-    <link rel="stylesheet" href="css/cart.css?v=11">
+    <link rel="stylesheet" href="/static/css/common.css?v=11">
+    <link rel="stylesheet" href="/static/css/cart.css?v=11">x
 </head>
 
 <body>
@@ -15,10 +15,10 @@
     <nav class="menu">
         <button class="mobile-menu-toggle" id="mobile-menu-toggle">☰</button>
         <ul id="main-menu">
-            <li onclick="window.location.href='index.html'">Főoldal</li>
+            <li><a href="/">Főoldal</a></li>
             <!-- Kosár gomb a menüben, mutatja a benne lévő tételek számát -->
-            <li onclick="window.location.href='cart.html'" class="cart-menu">
-                Kosár <span id="cart-count">(0)</span>
+            <li class="cart-menu">
+                <a href="/cart">Kosár<span id="cart-count">(0)</span></a> 
             </li>
             <!-- Ide kerül bejelentkezve a profil/kijelentkezés gomb -->
             <div id="user-nav" class="user-status"></div>
@@ -35,7 +35,7 @@
         <!-- Összegzés szekció: végösszeg és fizetés gomb -->
         <div class="cart-summary">
             <h2>Végösszeg: <span id="cart-total">0 Ft</span></h2>
-            <button class="checkout-btn" onclick="window.location.href='checkout.html'">Tovább a rendeléshez</button>
+            <button class="checkout-btn" onclick="window.location.href='/checkout'">Tovább a rendeléshez</button>
         </div>
     </main>
 
@@ -57,20 +57,20 @@
             <div class="footer-section">
                 <h4>Gyors Linkek</h4>
                 <ul>
-                    <li><a href="index.html">Főoldal</a></li>
-                    <li><a href="cart.html">Kosár</a></li>
-                    <li><a href="login.html">Bejelentkezés</a></li>
-                    <li><a href="register.html">Regisztráció</a></li>
+                    <li><a href="/">Főoldal</a></li>
+                    <li><a href="/cart">Kosár</a></li>
+                    <li><a href="/login">Bejelentkezés</a></li>
+                    <li><a href="/register">Regisztráció</a></li>
                 </ul>
             </div>
             <!-- Információk -->
             <div class="footer-section">
                 <h4>Ügyfélszolgálat</h4>
                 <ul>
-                    <li><a href="contact.html">Szállítási információk</a></li>
-                    <li><a href="contact.html">Gyakori kérdések</a></li>
-                    <li><a href="contact.html">Visszaküldés</a></li>
-                    <li><a href="contact.html">Kapcsolatfelvétel</a></li>
+                    <li><a href="/contact">Szállítási információk</a></li>
+                    <li><a href="/contact">Gyakori kérdések</a></li>
+                    <li><a href="/contact">Visszaküldés</a></li>
+                    <li><a href="/contact">Kapcsolatfelvétel</a></li>
                 </ul>
             </div>
             <!-- Elérhetőségek -->
@@ -90,9 +90,9 @@
     <div id="toast-container" class="toast-container"></div>
     
     <!-- Külső könyvtárak és saját scriptek -->
-    <script src="js/products_data.js?v=1.1"></script>
-    <script src="js/common.js?v=11"></script>
-    <script src="js/cart.js?v=2"></script>
+    <script src="/static/js/products_data.js?v=1.1"></script>
+    <script src="/static/js/common.js?v=11"></script>
+    <script src="/static/js/cart.js?v=2"></script>
 </body>
 
 </html>

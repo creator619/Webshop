@@ -21,7 +21,7 @@ function toggleWishlist(event, productId) {
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
 
     // Ha a kívánságlista oldalon vagyunk, azonnal újrarajzoljuk a listát
-    if (window.location.pathname.includes('wishlist.html')) {
+    if (window.location.pathname.includes('/wishlist')) {
         renderWishlist();
     } else {
         // Különben csak frissítjük az ikonokat
@@ -39,7 +39,7 @@ function renderWishlist() {
     renderProducts(wishlistedProducts, "wishlist-list");
 }
 
-if (window.location.pathname.includes('wishlist.html')) {
+if (window.location.pathname.includes('/wishlist')) {
     document.addEventListener('DOMContentLoaded', renderWishlist);
 }
 

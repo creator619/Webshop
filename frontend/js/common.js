@@ -63,18 +63,18 @@ function updateAuthUI() {
     if (user && userNav) {
         // Az új backend 'role' mezőt használ 'is_admin' helyett
         const isAdmin = user.role === 'admin' || user.is_admin;
-        const adminLink = isAdmin ? `<span class="username" onclick="window.location.href='admin.html'" style="color: var(--accent); margin-right: 15px;">⚙️ Admin</span>` : '';
+        const adminLink = isAdmin ? `<span class="username" onclick="window.location.href='/admin'" style="color: var(--accent); margin-right: 15px;">⚙️ Admin</span>` : '';
         userNav.innerHTML = `
             <li class="user-info">
                 ${adminLink}
-                <span class="username" onclick="window.location.href='profile.html'" title="Profil megtekintése">👤 ${user.name}</span>
+                <span class="username" onclick="window.location.href='/profile'" title="Profil megtekintése">👤 ${user.name}</span>
                 <button class="logout-btn" onclick="logout()">Kijelentkezés</button>
             </li>
         `;
     } else if (userNav) {
         userNav.innerHTML = `
-            <li onclick="window.location.href='login.html'" id="login-link" class="nav-btn">Bejelentkezés</li>
-            <li onclick="window.location.href='register.html'" id="register-link" class="nav-btn">Regisztráció</li>
+            <li onclick="window.location.href='/login'" id="login-link" class="nav-btn">Bejelentkezés</li>
+            <li onclick="window.location.href='/register'" id="register-link" class="nav-btn">Regisztráció</li>
         `;
     }
 }
@@ -87,7 +87,7 @@ function logout() {
     localStorage.removeItem("token");
     showToast("Sikeres kijelentkezés!");
     setTimeout(() => {
-        window.location.href = "index.html";
+        window.location.href = "/";
     }, 1000);
 }
 
@@ -112,9 +112,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!item || item.classList.contains("cart-menu") || item.classList.contains("user-info")) return;
 
             const cat = item.getAttribute("data-category");
-            const isMainPage = window.location.pathname.endsWith("index.html") || window.location.pathname === "/" || window.location.pathname.endsWith("/");
+            const isMainPage = window.location.pathname.endsWith("/") || window.location.pathname === "/" || window.location.pathname.endsWith("/");
 
-            if (cat !== null || item.innerText.includes("Főoldal")) {
+            // ez itt nem lesz jó
+            if (cat !== null) {
                 if (isMainPage && typeof applyFilters === 'function') {
                     // Ha a főoldalon vagyunk, aktiváljuk a szűrőt
                     document.querySelectorAll(".menu li").forEach(li => li.classList.remove("active"));
@@ -123,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else {
                     // Ha más oldalon vagyunk, visszairányítjuk a főoldalra a kategória paraméterrel
                     const targetCat = cat || "";
-                    window.location.href = `index.html${targetCat ? `?category=${targetCat}` : ""}`;
+                    window.location.href = `/${targetCat ? `?category=${targetCat}` : ""}`;
                 }
 
                 // Mobil menü bezárása kattintás után
@@ -340,14 +341,14 @@ async function openProduct(id) {
         const fullProduct = { ...data, sizes: staticInfo ? staticInfo.sizes : [] };
 
         localStorage.setItem("selectedProduct", JSON.stringify(fullProduct));
-        window.location.href = "product.html";
+        window.location.href = "/product";
     } catch (err) {
         console.error("Hiba a termék részleteinek lekérésekor:", err);
         // Hiba esetén megpróbáljuk a már korábban betöltött listából kikeresni
         const product = window.allProducts?.find(p => p.id === id);
         if (product) {
             localStorage.setItem("selectedProduct", JSON.stringify(product));
-            window.location.href = "product.html";
+            window.location.href = "/product";
         }
     }
 }

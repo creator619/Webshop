@@ -178,4 +178,22 @@ router.get("/", authMiddleware, (req, res) => {
         }
     );
 });
+
+router.get("/my", authMiddleware, (req, res) => {
+    const user_id = req.user.id;
+
+    db.all(
+        "SELECT * FROM orders WHERE user_id = ?",
+        [user_id],
+        (err, rows) => {
+            if (err) {
+                return res.status(500).json({ message: "Hiba", error: err.message });
+            }
+
+            res.json(rows);
+        }
+    );
+});
+
+
 module.exports = router;

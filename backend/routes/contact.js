@@ -9,11 +9,29 @@ const sqlite3 = require('sqlite3').verbose();
 
 const authMiddleware = require("../Middleware/authMiddleware");
 const adminMiddleware = require("../Middleware/adminMiddleware");
+const optionalAuth = require("../Middleware/optionalAuth")
 
 
-router.post("/contact", (req, res) => {
-    const userId = req.user ? req.user.id : null;
+router.post("/", optionalAuth, (req, res) => {
+
+    let userId = null;
+
+    if (req.user) {
+        userId = req.user.id;
+    } 
+
     const { name, email, category_id, message } = req.body;
+
+    if (!name || !email || !category_id || !message ) {
+        return res.status(400).json({
+            message: "Minden mező kitöltése kötelező!"
+        });
+    }
+    if (email.length > 100 || name.length > 100) {
+        return res.status(400).json({ 
+            message: "Az email és/vagy a név túl hosszú!"
+        });
+    }
 
     const sql = `
         INSERT INTO contact (user_id, name, email, category_id, message)
@@ -22,6 +40,7 @@ router.post("/contact", (req, res) => {
     db.run(sql, [userId, name, email, category_id, message], function(err) {
 
         if (err) {
+            console.log(err);
             return res.status(500).json({ message: "Adatbázis hiba" });
         }
         res.json({
