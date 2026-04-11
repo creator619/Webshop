@@ -111,7 +111,7 @@ if (window.location.pathname.includes("/checkout")) {
                 showToast("Rendelés sikeresen leadva!");
                 localStorage.removeItem("cart"); // Kosár ürítése
                 setTimeout(() => {
-                    window.location.href = `/order-success?id=${result.id}`;
+                    window.location.href = `/order-success?id=${result.orderId}`;
                 }, 1500);
             } catch (err) {
                 console.error(err);

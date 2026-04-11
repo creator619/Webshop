@@ -85,11 +85,34 @@ function renderCart() {
 }
 
 // Mennyiség módosítása a kosárban
-function changeQuantity(index, delta) {
+async function changeQuantity(index, delta) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    if (cart[index]) {
-        cart[index].quantity = (cart[index].quantity || 1) + delta;
-        if (cart[index].quantity < 1) {
+    const item = cart[index];
+    
+    if (item) {
+        // Ha növelni akarjuk a darabszámot, ellenőrizzük a készletet
+        if (delta > 0) {
+            try {
+                const product = await apiFetch(`/products/${item.id}`);
+                const currentQty = item.quantity || 1;
+                const sizeStocks = product.size_stocks || {};
+                const availableStock = sizeStocks[item.size] || 0;
+
+                if (currentQty + delta > availableStock) {
+                    showToast(`Sajnos nincs több készleten ebből a méretből (${item.size})!`, "error");
+                    return;
+                }
+            } catch (error) {
+                console.error("Hiba a készlet ellenőrzésekor:", error);
+                // Hiba esetén (pl. nincs net) a biztonság kedvéért nem engedjük a növelést
+                showToast("Hiba történt a készlet ellenőrzésekor.", "error");
+                return;
+            }
+        }
+
+        item.quantity = (item.quantity || 1) + delta;
+        
+        if (item.quantity < 1) {
             removeItem(index); // Ha 0 lenne a darabszám, töröljük
             return;
         }
@@ -111,4 +134,3 @@ function removeItem(index) {
     }
     updateCartCount();
 }
-
