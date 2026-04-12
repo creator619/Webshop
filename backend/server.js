@@ -41,10 +41,10 @@ app.get("/config", (req, res) => {
 });
 
 app.use(cors({
-    origin: "http://${LOCAL_IP}:${PORT}" // frontend címe
+    origin: `http://${LOCAL_IP}:${PORT}` // frontend címe
 }));
 app.use(express.json());
-app.use("/static", express.static("../frontend"));
+app.use("/static", express.static(path.join(__dirname, "../frontend")));
 
 // Statikus fájlok kiszolgálása (pl. képek a frontend mappából, ha szükséges, de itt frontend külön van)
 // Mivel a frontend a gyökérben van és a backend külön, most csak az API-t csináljuk.

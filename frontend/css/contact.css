@@ -4,7 +4,7 @@
 
 /* A tartalomrész grid elrendezése */
 .contact-main {
-    padding: 40px 20px;
+    padding: 20px 15px; /* Reduced for mobile */
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -12,7 +12,7 @@
 .contact-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 40px;
+    gap: 30px;
 }
 
 @media (max-width: 768px) {

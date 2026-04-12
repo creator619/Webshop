@@ -91,69 +91,9 @@ function logout() {
     }, 1000);
 }
 
-/**
- * Dinamikus kategórialista lekérése és megjelenítése a menüben.
- */
-async function loadCategoriesMenu() {
-    const menu = document.getElementById("main-menu");
-    if (!menu) return;
-
-    try {
-        // 1. Kedvencek link előkészítése
-        const cartItem = menu.querySelector('.cart-menu');
-        if (!menu.querySelector('.wishlist-menu')) {
-            const wishlistLi = document.createElement('li');
-            wishlistLi.className = 'wishlist-menu';
-            wishlistLi.innerHTML = `<a href="/wishlist">Kedvencek</a>`;
-            if (cartItem) {
-                menu.insertBefore(wishlistLi, cartItem);
-            } else {
-                menu.appendChild(wishlistLi);
-            }
-        }
-
-        // 2. Kategóriák lekérése
-        const categories = await apiFetch('/products/categories');
-        
-        // 3. Régi kategóriák törlése
-        const staticItems = menu.querySelectorAll('li[data-category]');
-        staticItems.forEach(item => item.remove());
-
-        // 4. Új kategóriák beszúrása a Kedvencek elé
-        const wishlistLi = menu.querySelector('.wishlist-menu');
-        categories.forEach(cat => {
-            const li = document.createElement('li');
-            li.setAttribute('data-category', cat.id);
-            li.textContent = cat.name;
-            
-            if (wishlistLi) {
-                menu.insertBefore(li, wishlistLi);
-            } else if (cartItem) {
-                menu.insertBefore(li, cartItem);
-            } else {
-                menu.appendChild(li);
-            }
-        });
-
-        // Szinkronizálás az URL paraméterrel
-        const urlParams = new URLSearchParams(window.location.search);
-        const catParam = urlParams.get('category');
-        if (catParam) {
-            const activeLi = menu.querySelector(`li[data-category="${catParam}"]`);
-            if (activeLi) {
-                menu.querySelectorAll("li").forEach(li => li.classList.remove("active"));
-                activeLi.classList.add("active");
-            }
-        }
-    } catch (err) {
-        console.error("Hiba a kategóriák dinamikus betöltésekor:", err);
-    }
-}
-
 // Alapvető UI események (pl. mobil menü, kategória váltás, GYIK) kezelése betöltéskor
 document.addEventListener("DOMContentLoaded", () => {
     updateAuthUI();
-    loadCategoriesMenu();
 
     // 1. Mobil menü nyitás/zárás kezelése
     const toggleBtn = document.getElementById("mobile-menu-toggle");
@@ -177,9 +117,15 @@ document.addEventListener("DOMContentLoaded", () => {
             // ez itt nem lesz jó
             if (cat !== null) {
                 if (isMainPage && typeof applyFilters === 'function') {
+                    const isAlreadyAcitve = item.classList.contains("active");
                     // Ha a főoldalon vagyunk, aktiváljuk a szűrőt
+                    // minden active törlése
                     document.querySelectorAll(".menu li").forEach(li => li.classList.remove("active"));
-                    item.classList.add("active");
+
+                    //ha NEM volt aktív -> újra aktiváljuk
+                    if (!isAlreadyAcitve) {
+                        item.classList.add("active");
+                    }
                     applyFilters();
                 } else {
                     // Ha más oldalon vagyunk, visszairányítjuk a főoldalra a kategória paraméterrel

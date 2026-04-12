@@ -5,30 +5,19 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 
-const authMiddleware = require("../Middleware/authMiddleware");
-const optionalAuth = require("../Middleware/optionalAuth")
 
 router.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../../frontend/html/index.html"));
 });
 
 
-router.get("/register", optionalAuth, (req, res) => {
-
-    if (req.user) {
-        console.log(req.user);
-        return res.redirect("/");
-    }
+router.get("/register", (req, res) => {
 
     res.sendFile(path.join(__dirname, "../../frontend/html/register.html"));
 });
 
 
-router.get("/login", optionalAuth, (req, res) => {
-
-    if (req.user) {
-        return res.redirect("/");
-    }
+router.get("/login", (req, res) => {
 
     res.sendFile(path.join(__dirname, "../../frontend/html/login.html"));
 });
@@ -44,11 +33,7 @@ router.get("/contact", (req, res) => {
 });
 
 
-router.get("/admin", optionalAuth, (req, res) => {
-
-    if (req.user) {
-        return res.redirect("/");
-    }
+router.get("/admin", (req, res) => {
 
     res.sendFile(path.join(__dirname, "../../frontend/html/admin.html"));
 });
@@ -61,20 +46,13 @@ router.get("/product", (req, res) => {
     res.sendFile(path.join(__dirname, "../../frontend/html/product.html"));
 });
 
-router.get("/profile", optionalAuth, (req, res) => {
+router.get("/profile", (req, res) => {
 
-    if (req.user) { 
-        return res.redirect("/");
-    }
 
     res.sendFile(path.join(__dirname, "../../frontend/html/profile.html"));
 });
 
-router.get("/wishlist", optionalAuth, (req, res) => {
-
-    if (req.user) { 
-        return res.redirect("/");
-    }
+router.get("/wishlist", (req, res) => {
 
     res.sendFile(path.join(__dirname, "../../frontend/html/wishlist.html"));
 });
