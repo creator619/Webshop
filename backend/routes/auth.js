@@ -4,7 +4,6 @@ const db = require("../db/database"); // SQLite connection
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../Middleware/authMiddleware");
-const { message } = require("statuses");
 
 // REGISZTRÁCIÓ
 router.post("/register", async (req, res) => {
@@ -82,11 +81,12 @@ router.post("/login", (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user.id, 
+            { 
+              id: user.id, 
               email: user.email,
               role: user.role
             },
-            "titkoskulcs123",
+            process.env.JWT_SECRET,
             { expiresIn: "2h" }
         );
 

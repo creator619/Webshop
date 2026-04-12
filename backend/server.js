@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
@@ -93,6 +94,10 @@ app.use("/", limiter, require("./routes/pages"))
 
 //rendelés leadása után a rendelési azonosító undefined
 
+if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET nincs beállítva!");
+}
+
 app.get("/:page", (req, res) => {
     const page = req.params.page;
     res.sendFile(path.join(__dirname, `../frontend/html/${page}`));
@@ -101,5 +106,4 @@ app.get("/:page", (req, res) => {
 //app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 app.listen(PORT, LOCAL_IP, () => {
     console.log(`Server running on http://${LOCAL_IP}:${PORT}`);
-    console.log(path.join(__dirname, "../frontend/html"));
 });
