@@ -124,22 +124,20 @@ router.get("/profile", authMiddleware, (req, res) => {
     });
 
 router.put("/profile", authMiddleware, (req, res) => {
-    const userId = req.user.id;
-    const { phone, zip, city, address } = req.body;
+const userId = req.user.id;
+const { phone, zip, city, address, name} = req.body;
 
-    console.log(userId, phone, zip, city, address);
-    if (!userId) {
-         return res.status(400).json({
-            message: "Nincs bejelentkezett felhasználó!"
-        });
-    }
-    
-    if (!phone || !zip || !city || !address) {
-        return res.status(400).json({
-            message: "Minden mező kitöltése kötelező!"
-        });
+db.run(`
+    UPDATE users
+    SET name = ?
+    WHERE id = ?
+`, [name, userId], function (err) {
+    if (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Hiba a név mentésekor" });
     }
 
+    // 2. Profil adatok frissítése (ami már megvan)
     db.run(`
         INSERT INTO user_profiles (user_id, phone, zip, city, address)
         VALUES(?, ?, ?, ?, ?)
@@ -152,22 +150,18 @@ router.put("/profile", authMiddleware, (req, res) => {
             phone IS NOT excluded.phone OR
             zip IS NOT excluded.zip OR
             city IS NOT excluded.city OR
-           address IS NOT excluded.address
+            address IS NOT excluded.address
     `,
     [userId, phone, zip, city, address], function (err) {
         if (err) {
             console.log(err);
             return res.status(500).json({ message: "Hiba mentés közben" });
         }
-        if (this.changes === 0) {
-            return res.json({
-                success: true,
-                message: "Nem történt változás"
-            });
-        }
+
         res.json({
             success: true,
-            message:"Profil frissítve"
+            message: "Profil frissítve"
+            });
         });
     });
 });
