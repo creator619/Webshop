@@ -178,7 +178,9 @@ async function saveProfileChanges() {
         setTimeout(() => location.reload(), 1000);
     } catch (err) {
         console.error(err);
-        showToast("Hiba a profil mentésekor!");
+
+        const message = err.message || "Hiba a profil mentésekor!"
+        showToast(message);
     }
 }
 

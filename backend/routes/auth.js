@@ -5,71 +5,65 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../Middleware/authMiddleware");
 
-// REGISZTRÁCIÓ
+const {validateRegisterSync, validateRegisterAsync, isValidEmail} = require("../validators/registerValidator");
+const getUserByEmail = require("../validators/loignValidator")
+const {getUserProfile, isValidProfileSync, updateProfile} = require("../validators/profileValidator")
+
 router.post("/register", async (req, res) => {
     const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-        return res.status(400).json({ message: "Minden mező kötelező!" });
-    }
-    if (name.length > 100 || email.length > 100 || password.length > 100) {
-        return res.status(400).json({ message: "Név, az email vagy a jelszó túl hosszú!" });
-    }
-    if (name.includes("<")) {
-        return res.status(400).json({ message: "Nem megfelelő név!" });
-    }
-
-    // Email ellenőrzés
-    db.get("SELECT * FROM users WHERE email = ?", [email], async (err, row) => {
-        if (err) return res.status(500).json({ message: "Adatbázis hiba" });
-        if (row) {
-            return res.status(400).json({ message: "Ez az email már létezik!" });
+    try {
+        const syncError = validateRegisterSync({ name, email, password });
+        if (syncError) {
+            return res.status(400).json({ message: syncError });
         }
+        const asyncError = await validateRegisterAsync({ name, email, password });
+        if (asyncError) {
+            return res.status(400).json({ message: asyncError});
+        }
+        const hashed = await bcrypt.hash(password, 10);
+        const role = "user";
 
-        try {
-            const hashed = await bcrypt.hash(password, 10);
-            const role = "user"
+        db.run(
+            "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+            [name, email, hashed, role],
+            function (err) {
+                if (err) return res.status(500).json({ message: "Hiba a mentés során" });
 
-            db.run(
-                "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
-                [name, email, hashed, role],
-                function (err) {
-                    if (err) return res.status(500).json({ message: "Hiba a mentés során" });
+                const userId = this.lastID;
 
-                    const userId = this.lastID;
-
-                    //profil létrehozása
-                    db.run(
-                        "INSERT INTO user_profiles (user_id) VALUES (?)",
-                        [userId],
-                        (err) => {
-                        if (err) return res.status(500).json({ message: "Profil létrehozási hiba"});
+                //profil létrehozása
+                db.run(
+                    "INSERT INTO user_profiles (user_id) VALUES (?)",
+                    [userId],
+                    (err) => {
+                    if (err) return res.status(500).json({ message: "Profil létrehozási hiba"});
 
                         res.json({ success: true });
                         }
                     );
                 }
             );
-        } catch (error) {
-            res.status(500).json({ message: "Szerver hiba" });
-        }
-    });
+    } catch (error) {
+        res.status(500).json({ message: "Szerver hiba" });
+    }
 });
 
-// BEJELENTKEZÉS
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
     const { email, password } = req.body;
+    try {
+        const syncError = isValidEmail(email);
+        
+        if (!syncError) {
+            return res.status(400).json({ message: "Hibás email vagy jelszó!" })
+        }
+        if (!email || !password) {
+            return res.status(400).json({ message: "Minden mező kitöltése kötelező!" });
+        }
+        if (email.length > 100 || password.length > 100) {
+            return res.status(400).json({ message: "Hibás email vagy jelszó!" });
+        }
 
-    if (!email || !password) {
-        return res.status(400).json({ message: "Minden mező kötelező!" });
-    }
-    if (email.length > 100 || password.length > 100) {
-        return res.status(400).json({ message: "Hibás email vagy jelszó!" });
-    }
-
-    db.get("SELECT * FROM users WHERE email = ?", [email], async (err, user) => {
-        if (err) return res.status(500).json({ message: "Adatbázis hiba" });
-
+        const user = await getUserByEmail(email);
         if (!user) {
             return res.status(400).json({ message: "Hibás email vagy jelszó!" });
         }
@@ -100,70 +94,45 @@ router.post("/login", (req, res) => {
                 role: user.role
             }
         });
-    });
+    } catch (err) {
+        res.status(500).json({ message: "Hiba"});
+    }
 });
 
-//Nincs kész tokenből kell hogy kérje a profil id-t, majd javítom
-// tesztelni kell még nem lett tesztelve
-// frontend részét meg kell hozzá csinálni
+router.get("/profile", authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const profile = await getUserProfile(userId);
+
+        res.json(profile);
+    } catch (err) {
+        res.status(500).json({ message:"Hiba a profil adatainak lekérésekor!" });
+    }
+});
 
 
-router.get("/profile", authMiddleware, (req, res) => {
+router.put("/profile", authMiddleware, async (req, res) => {
     const userId = req.user.id;
-    
-    db.get(`
-    SELECT u.name, u.email, p.phone, p.zip, p.city, p.address
-    FROM users u
-    LEFT JOIN user_profiles p ON u.id = p.user_id
-    WHERE u.id = ?    
-    `, [userId], (err, row) => {
-        if (err) return res.status(500).json({ message: "Hiba a profil adatainak lekérdezésekor!" });
-    
-        res.json(row);
-        });
-    });
+    const { phone, zip, city, address, name} = req.body;
 
-router.put("/profile", authMiddleware, (req, res) => {
-const userId = req.user.id;
-const { phone, zip, city, address, name} = req.body;
-
-db.run(`
-    UPDATE users
-    SET name = ?
-    WHERE id = ?
-`, [name, userId], function (err) {
-    if (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Hiba a név mentésekor" });
+    const syncError = await isValidProfileSync({ phone, zip, city, address, name});
+    if (syncError) {
+        return res.status(400).json({ message: syncError });
     }
 
-    // 2. Profil adatok frissítése (ami már megvan)
-    db.run(`
-        INSERT INTO user_profiles (user_id, phone, zip, city, address)
-        VALUES(?, ?, ?, ?, ?)
-        ON CONFLICT(user_id) DO UPDATE SET
-            phone = excluded.phone,
-            zip = excluded.zip,
-            city = excluded.city,
-            address = excluded.address
-        WHERE
-            phone IS NOT excluded.phone OR
-            zip IS NOT excluded.zip OR
-            city IS NOT excluded.city OR
-            address IS NOT excluded.address
-    `,
-    [userId, phone, zip, city, address], function (err) {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({ message: "Hiba mentés közben" });
-        }
+    try {
+        const profileChanges = await updateProfile({phone, zip, city, address, name, userId});
 
+        if (profileChanges === 0) {
+            return res.status(404).json({ message:"Felhasználü nem található!"});
+        }
         res.json({
             success: true,
-            message: "Profil frissítve"
-            });
+            message:"Profil frissítve"
         });
-    });
+    } catch (err) {
+        res.status(500).json({ message:"Szerver hiba"});
+    }
 });
 
 module.exports = router;

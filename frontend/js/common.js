@@ -234,7 +234,7 @@ async function apiFetch(endpoint, options = {}) {
     const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Hiba: ${response.status}`);
+        throw new Error(errorData.message || `Hiba: ${response.status}`);
     }
     const data = await response.json();
 
