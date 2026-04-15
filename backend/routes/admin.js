@@ -10,20 +10,9 @@ const sqlite3 = require('sqlite3').verbose();
 
 const authMiddleware = require("../Middleware/authMiddleware");
 const adminMiddleware = require("../Middleware/adminMiddleware");
-// törölni 
 
-// Összekötni a product adatokat a backendel, hogy az admin tudja szerkezteni akár az ár értékét
-// 4 plusz oldalt megcsinálni ami lent van
-// Admin fült befejezni funkciókkal ellátni
-// Akár akció funkció hozzáadása
+const { serviceOrdersUpdate, serviceOrders} = require("../service/adminService");
 
-
-// Token rendszer müködésbe hozása (Ehhez kell, hogy a frontend is hostolva legyen)
-// maradék oldalak megcsinálása
-// profil oldal megcsinálása
-
-
-// Nekem testek törölhetőek, ha kell maradhat
 
 
 router.get("/rendeles", authMiddleware, (req, res) => {
@@ -36,7 +25,7 @@ router.get("/rendeles", authMiddleware, (req, res) => {
     });
 });
 
-router.get("/useradat", authMiddleware, (req, res) => {
+router.get("/useradat", (req, res) => {
     db.all("SELECT * FROM orders", [], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
@@ -115,57 +104,30 @@ router.post("/test1", authMiddleware, (req, res) => {
     });
 });
 
+// service mappába.
 
-// Rendelés tábla lekérdezése
 
-router.get("/orders/", authMiddleware, adminMiddleware, (req, res) => {
-
- db.all("SELECT * FROM orders", [], (err, orders) => {
-    if (err) return res.status(500).json({ error: err.message });
-
-    db.all("SELECT * FROM order_items", [], (err2, items) => {
-        if (err2) return res.status(500).json({ error: err2.message });
-
-        const result = orders.map(order => {
-            return {
-                ...order,
-                order_items: items.filter(i => i.order_id === order.id)
-            };
-        });
-
-        res.json(result);
-      });
-    });
+router.get("/orders/", authMiddleware, adminMiddleware, async (req, res) => {
+    const result = await serviceOrders();
+    res.json(result);
 });
 
 
-// Rendelés frissítése
 
-router.put("/orders/:id", authMiddleware, adminMiddleware, (req, res) => {
-    const { id } = req.params;
-    const { user_email, total_price, status, created_at } = req.body;
-
-    const sql = `
-        UPDATE orders
-        SET user_email = ?, total_price = ?, status = ?, created_at = ?
-        WHERE id = ?
-    `;    
-    db.run(sql, [user_email, total_price, status, created_at , id], function(err) {
-
-        if (err) {
-            return res.status(500).json({ message:"Adatbázis hiba" });
-        }
-        if (this.changes === 0) {
-
-            return res.status(404).json({
-                message: "Azonosítóval nem található termék!"
-            });
-        }
+router.put("/orders/:id", authMiddleware, adminMiddleware, async (req, res) =>{
+    try {
+        const result = await serviceOrdersUpdate(req.params, req.body);
         res.json({
-            message: "Rendelés adatai frissítve!"
+            success:true,
+            data: result
         });
-    });
-});
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
+})
+
 
 // rendelés törlése
 
@@ -221,7 +183,7 @@ router.post("/product", authMiddleware, adminMiddleware,(req, res) => {
 router.put("/product/:id", authMiddleware, adminMiddleware, (req, res) => {
 
     const { id } = req.params;
-    const strockString = JSON.stringify(req.body.stock);
+    const stockString = JSON.stringify(req.body.stock);
     const { name, price, image, category_id, description, sizes } = req.body;
 
 
@@ -230,7 +192,7 @@ router.put("/product/:id", authMiddleware, adminMiddleware, (req, res) => {
         SET name = ?, price = ?, image = ?, category_id = ?, description = ?, sizes = ?, stock = ?
         WHERE id = ?
     `;    
-    db.run(sql, [name, price, image, category_id, description, sizes, strockString, id], function(err) {
+    db.run(sql, [name, price, image, category_id, description, sizes, stockString, id], function(err) {
 
         if (err) {
             return res.status(500).json({ message:"Adatbázis hiba" });
