@@ -318,7 +318,10 @@ async function fetchProducts() {
         // Statikus kiegészítések (pl. választható méretek) hozzáfűzése a backend adatokhoz
         const mergedData = data.map(p => {
             const staticInfo = (typeof productsData !== 'undefined') ? productsData.find(sp => sp.id === p.id) : null;
-            return { ...p, sizes: staticInfo ? staticInfo.sizes : [] };
+            return {
+                ...p,
+                sizes: staticInfo?.sizes || (typeof p.sizes === "string" ? p.sizes.split(",") : p.sizes || [])
+            };
         });
 
         window.allProducts = mergedData;
@@ -350,7 +353,10 @@ async function openProduct(id) {
         const data = await apiFetch(`/products/${id}`);
 
         const staticInfo = (typeof productsData !== 'undefined') ? productsData.find(sp => sp.id === data.id) : null;
-        const fullProduct = { ...data, sizes: staticInfo ? staticInfo.sizes : [] };
+        const fullProduct = {
+            ...data,
+            sizes: staticInfo?.sizes || (typeof data.sizes === "string" ? data.sizes.split(",") : data.sizes || [])
+        };
 
         localStorage.setItem("selectedProduct", JSON.stringify(fullProduct));
         window.location.href = "/product";

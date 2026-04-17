@@ -11,109 +11,21 @@ const sqlite3 = require('sqlite3').verbose();
 const authMiddleware = require("../Middleware/authMiddleware");
 const adminMiddleware = require("../Middleware/adminMiddleware");
 
-const { serviceOrdersUpdate, serviceOrders} = require("../service/adminService");
-
-
-
-router.get("/rendeles", authMiddleware, (req, res) => {
-    db.run("ALTER TABLE orders ADD COLUMN shipping_zip TEXT;", [], (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json({ success: true });
-    });
-});
-
-router.get("/useradat", (req, res) => {
-    db.all("SELECT * FROM orders", [], (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json(rows);
-    });
-});
-
-router.get("/categoriateszt", (req, res) => {
-    const name = "Rendeléssel kapcsolatos kérdés";
-    const name2 = "Szállításról érdeklődnék";
-    const name3 = "Termék visszaküldése";
-    const name4 = "Egyéb";
-
-    const sql = `
-        INSERT INTO category (name)
-        VALUES (?)
-    `;
-    db.run(sql, [name], function(err) {
-
-        if (err) {
-            return res.status(500).json({ message: "hiba" });
-        }
-        db.run(sql, [name2], function(err) {
-
-        if (err) {
-            return res.status(500).json({ message: "hiba" });
-        }
-            db.run(sql, [name3], function(err) {
-
-            if (err) {
-             return res.status(500).json({ message: "hiba" });
-            }
-                db.run(sql, [name4], function(err) {
-
-                if (err) {
-                 return res.status(500).json({ message: "hiba" });
-                }
-              res.json({
-                 success: true,
-                 message:"Kategória sikeresen hozzáadva!"
-                });
-              });
-            });
-        });
-    });
-});
-
-router.get("/test", authMiddleware, adminMiddleware, (req, res) => {
-    db.all("SELECT * FROM user_profiles", [], (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json(rows);
-    });
-});
-
-router.post("/test1", authMiddleware, (req, res) => {
-    const { id, role} = req.body;
-
-    const sql = `
-        UPDATE users
-        SET role = ?
-        WHERE id = ?
-    `;    
-    db.run(sql, [role, id], function(err) {
-
-        if (err) {
-            return res.status(500).json({ message:"Adatbázis hiba" });
-        }
-        res.json({
-            message: "Jogosultság megadva!"
-        });
-    });
-});
-
-// service mappába.
-
+const { serviceOrdersUpdate, serviceOrders, serviceOrdersDelete, serviceProductPost, serviceProductPut, serviceProductDelete, serviceCategoriesGet, serviceUsersGet, serviceUsersProfilesGet, serviceProductCategoriesGet, serviceCategoriesPost, serviceCategoriesUpdate, serviceCategoriesDeleteSync, serviceContactGet, serviceContactDeleteSync} = require("../service/adminService");
+const { isValidTotalPrice } = require("../validators/adminValidator");
+const { isValidName } = require("../validators/registerValidator");
 
 router.get("/orders/", authMiddleware, adminMiddleware, async (req, res) => {
+    try {
     const result = await serviceOrders();
     res.json(result);
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    } 
 });
-
-
-
+// nincs használva
 router.put("/orders/:id", authMiddleware, adminMiddleware, async (req, res) =>{
     try {
         const result = await serviceOrdersUpdate(req.params, req.body);
@@ -126,220 +38,197 @@ router.put("/orders/:id", authMiddleware, adminMiddleware, async (req, res) =>{
             message: err.message
         });
     }
-})
-
-
-// rendelés törlése
-
-router.delete("/orders/:id", authMiddleware, adminMiddleware, (req, res) => {
-
-    const { id } = req.params;
-    
-    const sql = `
-        DELETE FROM orders WHERE id = ?
-    `;
-
-    db.run(sql, [id], function(err) {
-    
-        if (err) {
-            return res.status(500).json({ message:"Adatbázis hiba" });
-        }
-        if (this.changes === 0) {
-
-            return res.status(404).json({
-                message: "Azonosítóval nem található termék!"
-            });
-        }
+});
+// nincs használva
+router.delete("/orders/:id", async (req, res) => {
+    try {
+        const result = await serviceOrdersDelete( req.params.id);
         res.json({
-            message: "Rendelés törölve"
+            success:true,
+            data: result
         });
-    });
-});
-
-
-//Product hozzáadása
-
-router.post("/product", authMiddleware, adminMiddleware,(req, res) => {
-
-    const { name, price, image, category_id, description } = req.body;
-
-    const sql = `
-        INSERT INTO products (name, price, image, category_id, description)
-        VALUES (?, ?, ?, ?, ?)
-    `;
-    db.run(sql, [name, price, image, category_id, description], function(err) {
-
-        if (err) {
-            return res.status(500).json({ message: "Adatbázis hiba" });
-        }
-        res.json({
-            message: "Termék hozzáadva"
-        }); 
-    });
-});
-
-//Product frissítése
-
-router.put("/product/:id", authMiddleware, adminMiddleware, (req, res) => {
-
-    const { id } = req.params;
-    const stockString = JSON.stringify(req.body.stock);
-    const { name, price, image, category_id, description, sizes } = req.body;
-
-
-    const sql = `
-        UPDATE products
-        SET name = ?, price = ?, image = ?, category_id = ?, description = ?, sizes = ?, stock = ?
-        WHERE id = ?
-    `;    
-    db.run(sql, [name, price, image, category_id, description, sizes, stockString, id], function(err) {
-
-        if (err) {
-            return res.status(500).json({ message:"Adatbázis hiba" });
-        }
-        if (this.changes === 0) {
-
-            return res.status(404).json({
-                message: "Azonosítóval nem található termék!"
-            });
-        }
-        res.json({
-            message: "Termék adatai frissítve"
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
         });
-    });
+    }
 });
 
-//termék törlése
-
-router.delete("/product/:id", authMiddleware, adminMiddleware,(req, res) => {
-
-    const { id } = req.params;
-    
-    const sql = `
-        DELETE FROM products WHERE id = ?
-    `;
-
-    db.run(sql, [id], function(err) {
-    
-        if (err) {
-            return res.status(500).json({ message:"Adatbázis hiba" });
-        }
-        if (this.changes === 0) {
-
-            return res.status(404).json({
-                message: "Azonosítóval nem található termék!"
-            });
-        }
+router.post("/product", authMiddleware, adminMiddleware, async (req, res) => {
+    try {
+        const result = await serviceProductPost(req.body);
         res.json({
-            message: "Termék törölve"
+            success:true,
+            data:result,
+            message:"Termék hozzáadva!"
         });
-    });
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
 });
 
-
-//Category lekérés
-
-router.get("/categories", authMiddleware, adminMiddleware, (req, res) => {
-
-    db.all("SELECT * FROM category", [], (err, rows) => {
-
-        if (err) {
-            return res.status(500).json({message: "Hiba"});
-        }
-        res.json(rows);
-    });
+router.put("/product/:id", async (req, res) => {
+    try {
+        const result = await serviceProductPut(req.body, req.params);
+        res.json({
+            success:true,
+            data: result
+        });
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
 });
 
-router.post("/categories", authMiddleware, adminMiddleware, (req, res) => {
+router.delete("/product/:id", async (req, res) => {
+    try {
+        const result = await serviceProductDelete(req.params);
+        res.json({
+            success:true,
+            data: result
+        });
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
+});
 
-    const { name } = req.body;
-
-    const sql = `
-        INSERT INTO category (name)
-        VALUES (?)
-    `;
-    db.run(sql, [name], function(err) {
-
-        if (err) {
-            return res.status(500).json({ message: "hiba" });
-        }
+// nincs használva
+router.get("/categories", authMiddleware, adminMiddleware,async (req,res) => {
+    try {
+        const result = await serviceCategoriesGet();
+        res.json({
+            success:true,
+            data: result
+        });
+    } catch (err) {
+        res.status(400).json({
+             message: err.message
+        });
+    }
+});
+// nincs használva
+router.post("/categories", authMiddleware, adminMiddleware, async (req, res) => {
+    try {
+        const result = await serviceCategoriesPost(req.body);
         res.json({
             success: true,
-            message:"Kategória sikeresen hozzáadva!"
+            data: result,
+            message: "Kategória hozzáadva!"
         });
-    });
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
 });
-
-
-router.put("/categories", authMiddleware, adminMiddleware, (req, res) => {
-    const { name, id } = req.body;
-    const sql = `
-        UPDATE category
-        SET name = ?
-        WHERE id = ?
-    `;
-    db.run(sql, [name, id], function(err) {
-
-        if (err) {
-            return res.status(500).json({ message: "hiba" });
-        }
+// nincs használva
+router.put("/categories/:id", async (req, res) => {
+    try {
+        const result = await serviceCategoriesUpdate(req.body, req.params);
         res.json({
-            success: true,
-            message:"Kategória sikeresen frissítve!"
+            success:true,
+            data: result,
+            message: "Kategória frissítve!"
         });
-    });
-});
-
-//Contact lekérdezés
-
-router.get("/contact", authMiddleware, adminMiddleware, (req, res) => {
-   
- db.all("SELECT * FROM contact", [], (err, contacts) => {
-    if (err) return res.status(500).json({ error: err.message });
-
-    db.all("SELECT * FROM category", [], (err2, categories) => {
-        if (err2) return res.status(500).json({ error: err2.message });
-
-        const result = contacts.map(contact => {
-            return {
-                ...contact,
-                category: categories.find(c => c.id === contact.category_id) || null 
-            };
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
         });
-
-        res.json(result);
-      });
-    });
+    }
+});
+// nincs használva
+router.delete("/categories/:id", async (req, res) => {
+    try {
+        const result = await serviceCategoriesDeleteSync(req.params);
+        res.json({
+            success:true,
+            data: result,
+            message: "Kategória sikeresen törölve!"
+        });
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
 });
 
-//Users lekérdezés
 
-router.get("/users", authMiddleware, adminMiddleware, (req, res) => {
-
-    db.all("SELECT * FROM users", [], (err, rows) => {
-
-        if (err) {
-            res.status(500).json({ error: err.message})
-        }
-        res.json(rows);
-    });
+router.get("/contact",async (req,res) => {
+    try {
+        const result = await serviceContactGet();
+        res.json({
+            success:true,
+            data: result
+        });
+    } catch (err) {
+        res.status(400).json({
+             message: err.message
+        });
+    }
 });
 
-
-//user_profiles lekérdezés
-
-
-router.get("/profiles", authMiddleware, adminMiddleware, (req, res) => {
-
-    db.all("SELECT * FROM user_profiles", [], (err, rows) => {
-
-        if (err) {
-            res.status(500).json({ error: err.message})
-        }
-        res.json(rows);
-    });
+router.delete("/contact/:id", async (req, res) => {
+    try {
+        const result = await serviceContactDeleteSync(req.params);
+        res.json({
+            success:true,
+            data: result,
+            message: "Üzenet sikeresen törölve!"
+        });
+    } catch (err) {
+        res.status(400).json({
+            message: err.message
+        });
+    }
 });
 
+// nincs használva
+router.get("/users", authMiddleware, adminMiddleware, async (req,res) => {
+    try {
+        const result = await serviceUsersGet();
+        res.json({
+            success:true,
+            data: result
+        });
+    } catch (err) {
+        res.status(400).json({
+             message: err.message
+        });
+    }
+});
+// nincs használva
+router.get("/profiles", authMiddleware, adminMiddleware, async (req,res) => {
+    try {
+        const result = await serviceUsersProfilesGet();
+        res.json({
+            success:true,
+            data: result
+        });
+    } catch (err) {
+        res.status(400).json({
+             message: err.message
+        });
+    }
+});
+// nincs használva
+router.get("/product_categories", authMiddleware, adminMiddleware, async (req,res) => {
+    try {
+        const result = await serviceProductCategoriesGet();
+        res.json({
+            success:true,
+            data: result
+        });
+    } catch (err) {
+        res.status(400).json({
+             message: err.message
+        });
+    }
+});
 
 module.exports = router;
 

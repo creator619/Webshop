@@ -41,6 +41,10 @@ if (window.location.pathname.includes("/product")) {
         if (sizeContainer && product.sizes) {
             sizeContainer.innerHTML = "";
             
+            const sizes = Array.isArray(product.sizes)
+                ? product.sizes
+                : product.sizes.split(",");
+
             // Készletelosztás logikája (mivel a db nem tárol bontást, egy determinisztikus elosztást használunk)
             product.sizes.forEach((size, index) => {
                 let sizeStock = 0;

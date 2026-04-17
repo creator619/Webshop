@@ -82,7 +82,8 @@ function setupTabs() {
 // Kategóriák betöltése a backendről a termék felvételi legördülő menübe
 async function loadCategoriesAdmin() {
     try {
-        const categories = await apiFetch('/admin/categories');
+        const response = await apiFetch('/admin/product_categories');
+        const categories = response.data;
         //lekéri a categories adatokat, de nem írja ki sehol
         const select = document.getElementById('p-category');
         if (select) {
@@ -386,8 +387,8 @@ async function deleteProduct(id) {
 // --- ÜZENETEK: Ügyfél üzenetek listázása és kezelése ---
 async function loadMessages() {
     try {
-        const messages = await apiFetch('/admin/contact');
-        console.log(messages);
+        const response = await apiFetch('/admin/contact');
+        const messages = response.data;
         const tbody = document.getElementById('messages-table-body');
         if (!tbody) return;
 
@@ -421,7 +422,7 @@ async function deleteMessage(id) {
     if (!confirm('Biztosan törölni szeretnéd ezt az üzenetet?')) return;
     
     try {
-        await apiFetch(`/admin/messages/${id}`, { method: 'DELETE' });
+        await apiFetch(`/admin/contact/${id}`, { method: 'DELETE' });
         showToast('Üzenet törölve!');
         loadMessages();
     } catch (err) {
