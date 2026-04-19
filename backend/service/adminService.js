@@ -1,5 +1,7 @@
-const { updateOrders, getOrders, getOrderItems, deleteOrder, getProductCategories, addProductWithStocks, updateProductWithStocks, deleteProduct, getCategories, getUsers, getUserProfiles, addCategories, updateCategories, deleteCategories, getContact, deleteContact} = require("../db/adminDB");
-const { validateOrderEditsSync, isValidId, validateProductPostSync, validateProductDeleteSync, validateCategoriesPostSync, validateCategoriesUpdateSync, validateCategoriesDeleteSync, validateContactDeleteSync} = require("../validators/adminValidator");
+const { updateOrders, getOrders, getOrderItems, deleteOrder, getProductCategories, addProductWithStocks, updateProductWithStocks, deleteProduct, getCategories, getUsers, getUserProfiles, addCategories, updateCategories, deleteCategories, getContact, deleteContact, getOrderById} = require("../db/adminDB");
+const { validateOrderEditsSync, validateProductPostSync, validateProductDeleteSync, validateCategoriesPostSync, validateCategoriesUpdateSync, validateCategoriesDeleteSync, validateContactDeleteSync} = require("../validators/adminValidator");
+const {isValidId} = require("../validators/commonValidator");
+
 
 async function serviceOrders() {
     const orders = await getOrders();
@@ -13,7 +15,7 @@ async function serviceOrders() {
     return result;
 }
 
-async function serviceOrdersUpdate({ id }, {user_email, guest_email, total_price, status, shipping_name, shipping_phone, shipping_address, shipping_city, shipping_zip}) {
+async function serviceOrdersUpdate({ id }, {user_email, guest_email, total_price, status, shipping_name, shipping_phone, shipping_address, shipping_city, shipping_zip}, user) {
     if (guest_email && user_email) {
         throw new Error("Nem lehet egyszerre guest és user email!");
     }

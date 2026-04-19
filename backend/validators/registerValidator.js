@@ -1,33 +1,11 @@
-const db = require("../db/database");
 
-function isValidEmail(email) {
-    //const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const regex = /^[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    return regex.test(email);
-}
-function isEmailTaken(email) {
-    return new Promise((resolve, reject) => {
-        db.get(
-            "SELECT * FROM users WHERE email = ?",
-            [email],
-            (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(!!row); // true ha van, false ha nincs
-                }
-            }
-        );
-    });
-}
+const { isEmailTaken } = require("../db/authDB")
+const { isValidEmail, isValidName } = require("../validators/commonValidator");
+
+
 function isValidPassword(password) {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,100}$/;
     return regex.test(password);
-}
-
-function isValidName(name) {
-    const regex = /^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s]+$/;
-    return regex.test(name);
 }
 
 
@@ -54,10 +32,8 @@ async function validateRegisterAsync(data) {
 }
 
 module.exports = {
-    isValidEmail,
     isEmailTaken,
     isValidPassword,
-    isValidName,
     validateRegisterSync,
     validateRegisterAsync
 };

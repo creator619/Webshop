@@ -1,19 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../db/database"); // SQLite connection
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-
-const sqlite3 = require('sqlite3').verbose();
-
-
 
 const authMiddleware = require("../Middleware/authMiddleware");
 const adminMiddleware = require("../Middleware/adminMiddleware");
 
 const { serviceOrdersUpdate, serviceOrders, serviceOrdersDelete, serviceProductPost, serviceProductPut, serviceProductDelete, serviceCategoriesGet, serviceUsersGet, serviceUsersProfilesGet, serviceProductCategoriesGet, serviceCategoriesPost, serviceCategoriesUpdate, serviceCategoriesDeleteSync, serviceContactGet, serviceContactDeleteSync} = require("../service/adminService");
-const { isValidTotalPrice } = require("../validators/adminValidator");
-const { isValidName } = require("../validators/registerValidator");
+
 
 router.get("/orders/", authMiddleware, adminMiddleware, async (req, res) => {
     try {
@@ -28,7 +20,7 @@ router.get("/orders/", authMiddleware, adminMiddleware, async (req, res) => {
 // nincs használva
 router.put("/orders/:id", authMiddleware, adminMiddleware, async (req, res) =>{
     try {
-        const result = await serviceOrdersUpdate(req.params, req.body);
+        const result = await serviceOrdersUpdate(req.params, req.body, req.user);
         res.json({
             success:true,
             data: result
