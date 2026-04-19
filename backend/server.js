@@ -14,6 +14,11 @@ const limiter = rateLimit({
     message: "Túl sok kérés, próbáld később"
 });
 
+const strictLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 perc
+    max: 5, // max 5 request
+    message: "Túl sok kérés, próbáld később"
+});
 const os = require("os");
 
 function getLocalIP() {
@@ -60,9 +65,9 @@ app.use("/static", express.static(path.join(__dirname, "../frontend")));
 
 app.use("/auth", limiter, require("./routes/auth"));
 app.use("/products", limiter, require("./routes/products"));
-app.use("/orders", limiter, require("./routes/orders"));
-app.use("/contact", limiter, require("./routes/contact"));
-app.use("/admin", require("./routes/admin"));
+app.use("/orders", strictLimiter, require("./routes/orders"));
+app.use("/contact", strictLimiter, require("./routes/contact"));
+app.use("/admin", limiter, require("./routes/admin"));
 //A képfájlokat a backend statikus kiszolgálással (Express static middleware) szolgálja ki, az adatbázis csak a fáljnevet tárolja
 app.use("/images", express.static("./images"));
 app.use("/", limiter, require("./routes/pages"))
