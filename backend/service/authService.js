@@ -1,5 +1,5 @@
 const {validateRegisterSync, validateRegisterAsync} = require("../validators/registerValidator");
-const {validateLoginAsync, validateLogin} = require("../validators/loignValidator");
+const {validateLoginAsync, validateLogin} = require("../validators/loginValidator");
 const { isValidProfileSync, updateProfile} = require("../validators/profileValidator");
 const { postRegister, getUserByEmail, getUserProfile} = require("../db/authDB");
 

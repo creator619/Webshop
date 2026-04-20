@@ -5,6 +5,13 @@ const authMiddleware = require("../Middleware/authMiddleware");
 const adminMiddleware = require("../Middleware/adminMiddleware");
 
 const { serviceOrdersUpdate, serviceOrders, serviceOrdersDelete, serviceProductPost, serviceProductPut, serviceProductDelete, serviceCategoriesGet, serviceUsersGet, serviceUsersProfilesGet, serviceProductCategoriesGet, serviceCategoriesPost, serviceCategoriesUpdate, serviceCategoriesDeleteSync, serviceContactGet, serviceContactDeleteSync} = require("../service/adminService");
+const { getProductCategories } = require("../db/adminDB");
+
+router.get("/teszt", async (req, res) => {
+
+    const result = await getProductCategories();
+    res.json(result);
+});
 
 
 router.get("/orders/", authMiddleware, adminMiddleware, async (req, res) => {

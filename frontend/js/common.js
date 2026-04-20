@@ -30,29 +30,6 @@ function getProductImage(imagePath) {
 }
 
 /**
- * Toast értesítés megjelenítése a felhasználónak.
- * A képernyő jobb alsó sarkában úszik be, majd 3 másodperc után eltűnik.
- */
-function showToast(message) {
-    const container = document.getElementById("toast-container");
-    if (!container) return;
-
-    const toast = document.createElement("div");
-    toast.className = "toast";
-    toast.innerHTML = `<span>✨</span> ${message}`;
-
-    container.appendChild(toast);
-
-    // Animált eltüntetés időzítése
-    setTimeout(() => {
-        toast.classList.add("hide");
-        setTimeout(() => {
-            toast.remove();
-        }, 300);
-    }, 3000);
-}
-
-/**
  * Ellenőrzi a bejelentkezési állapotot a LocalStorage-ból,
  * és frissíti a fejlécben található navigációs gombokat (Login helyett Profil/Admin).
  */

@@ -56,7 +56,32 @@ function initDb() {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (category_id) REFERENCES category(id)
         )`);
+        db.run(`CREATE TABLE IF NOT EXISTS product_categories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            size_type TEXT
+            )`);
 
+        db.get("SELECT count(*) as count FROM product_categories", (err, row) => {
+            if (err) {
+                console.error("Hiba a kategóriák ellenőrzésekor:", err.message);
+                return;
+            }
+            if (row.count === 0) {
+                const categories = [{name: "Ing", size_type: "clothing"}, {name: "Zakó", size_type: "clothing"}, {name: "Nadrág", size_type: "clothing"}, {name: "Cipő", size_type: "shoes"}];
+                const upload = db.prepare("INSERT INTO product_categories (name, size_type) VALUES (?, ?)");
+                categories.forEach(category => {
+                    upload.run(category.name, category.size_type);
+                });
+                upload.finalize((err) => {
+                    if(err) {
+                        console.error("Hiba a kategóriák feltöltésekor:", err.message);
+                    } else {
+                        console.log("Kategóriák sikeresen feltöltve.");
+                    }
+                });
+            }
+        });
         // Products tábla
 
         // Módosítás nem volt méret oszlop és így a frontend nem működött, ezért bele raktam.
@@ -90,7 +115,7 @@ function initDb() {
             shipping_address TEXT,
             shipping_city TEXT,
             shipping_zip TEXT
-        )`);
+            )`);
 
             // Order Items tábla
             db.run(`CREATE TABLE IF NOT EXISTS order_items (
@@ -101,7 +126,7 @@ function initDb() {
             quantity INTEGER,
             size TEXT,
             FOREIGN KEY(order_id) REFERENCES orders(id)
-        )`);
+            )`);
 
             // Product Stock tábla
             db.run(`CREATE TABLE IF NOT EXISTS product_stock (
