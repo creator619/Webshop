@@ -39,7 +39,7 @@ router.put("/orders/:id", authMiddleware, adminMiddleware, async (req, res) =>{
     }
 });
 // nincs használva
-router.delete("/orders/:id", async (req, res) => {
+router.delete("/orders/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const result = await serviceOrdersDelete( req.params.id);
         res.json({
@@ -68,7 +68,7 @@ router.post("/product", authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
-router.put("/product/:id", async (req, res) => {
+router.put("/product/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const result = await serviceProductPut(req.body, req.params);
         res.json({
@@ -82,7 +82,7 @@ router.put("/product/:id", async (req, res) => {
     }
 });
 
-router.delete("/product/:id", async (req, res) => {
+router.delete("/product/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const result = await serviceProductDelete(req.params);
         res.json({
@@ -126,7 +126,7 @@ router.post("/categories", authMiddleware, adminMiddleware, async (req, res) => 
     }
 });
 // nincs használva
-router.put("/categories/:id", async (req, res) => {
+router.put("/categories/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const result = await serviceCategoriesUpdate(req.body, req.params);
         res.json({
@@ -141,7 +141,7 @@ router.put("/categories/:id", async (req, res) => {
     }
 });
 // nincs használva
-router.delete("/categories/:id", async (req, res) => {
+router.delete("/categories/:id", authMiddleware, adminMiddleware,  async (req, res) => {
     try {
         const result = await serviceCategoriesDeleteSync(req.params);
         res.json({
@@ -157,7 +157,7 @@ router.delete("/categories/:id", async (req, res) => {
 });
 
 
-router.get("/contact",async (req,res) => {
+router.get("/contact", authMiddleware, adminMiddleware, async (req,res) => {
     try {
         const result = await serviceContactGet();
         res.json({
@@ -171,7 +171,7 @@ router.get("/contact",async (req,res) => {
     }
 });
 
-router.delete("/contact/:id", async (req, res) => {
+router.delete("/contact/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const result = await serviceContactDeleteSync(req.params);
         res.json({
