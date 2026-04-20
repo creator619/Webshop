@@ -2,7 +2,7 @@ const { validateOrderPostSync, prepareOrderItems} = require("../validators/order
 const { saveOrder, getIdempotencyKey, saveIdempotencyKey, getOrders, getOrdersMy} = require("../db/orderDB");
 const {isDuplicateRequest, createRequestKey} = require("../Middleware/idempotency");
 
-async function serviceOrder(userData, body, key) {  
+async function serviceOrder(userData, body) {  
     let user_id = userData ? userData.id : null;
     const requestKey = createRequestKey(user_id, body);
 
@@ -22,7 +22,7 @@ async function serviceOrder(userData, body, key) {
 
     const orderId = await saveOrder(saveData);
 
-    await saveIdempotencyKey(key, orderId);
+    await saveIdempotencyKey(requestKey, orderId);
 
     return { orderId };
 }
