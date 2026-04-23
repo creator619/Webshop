@@ -1,9 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-<<<<<<< HEAD
-=======
 const bcrypt = require("bcrypt");
->>>>>>> webshop-backend-update
 
 const dbPath = path.resolve(__dirname, 'webshop.db');
 
@@ -18,17 +15,6 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 function initDb() {
     db.serialize(() => {
-<<<<<<< HEAD
-        // Users tábla
-        db.run(`CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            email TEXT UNIQUE,
-            password TEXT
-        )`);
-
-        // Products tábla
-=======
         //foreing key bekapcsolása
         db.run("PRAGMA foreign_keys = ON");
         
@@ -147,20 +133,15 @@ function initDb() {
         // Products tábla
 
         // Módosítás nem volt méret oszlop és így a frontend nem működött, ezért bele raktam.
->>>>>>> webshop-backend-update
         db.run(`CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             price INTEGER,
             image TEXT,
             category_id INTEGER,
-<<<<<<< HEAD
-            description TEXT
-=======
             description TEXT,
             sizes TEXT,
             stock TEXT
->>>>>>> webshop-backend-update
         )`, (err) => {
             if (err) {
                 console.error("Hiba a products tábla létrehozásakor:", err);
@@ -170,13 +151,6 @@ function initDb() {
             // Orders tábla
             db.run(`CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-<<<<<<< HEAD
-            user_email TEXT,
-            total_price INTEGER,
-            status TEXT DEFAULT 'pending',
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )`);
-=======
             user_id INTEGER NULL,
             user_email TEXT,
             total_price INTEGER,
@@ -188,7 +162,6 @@ function initDb() {
             shipping_city TEXT,
             shipping_zip TEXT
             )`);
->>>>>>> webshop-backend-update
 
             // Order Items tábla
             db.run(`CREATE TABLE IF NOT EXISTS order_items (
@@ -197,13 +170,6 @@ function initDb() {
             product_name TEXT,
             price INTEGER,
             quantity INTEGER,
-<<<<<<< HEAD
-            FOREIGN KEY(order_id) REFERENCES orders(id)
-        )`);
-
-            // Ha üres a products tábla, töltsük fel
-            db.get("SELECT count(*) as count FROM products", (err, row) => {
-=======
             size TEXT,
             FOREIGN KEY(order_id) REFERENCES orders(id)
             )`);
@@ -223,39 +189,10 @@ function initDb() {
                     console.error(err.message);
                     return;
                 }
->>>>>>> webshop-backend-update
                 if (row.count === 0) {
                     console.log("Termékek feltöltése...");
                     const products = [
                         // Ingek (Category 1)
-<<<<<<< HEAD
-                        { name: "Fehér elegáns ing", price: 8990, image: "shirt1.jpg", category_id: 1, description: "Prémium minőségű pamut ing, alkalmi és hétköznapi viseletre is." },
-                        { name: "Kék lezser ing", price: 7990, image: "shirt2.jpg", category_id: 1, description: "Kényelmes viselet, ideális hétvégi programokhoz." },
-                        { name: "Kockás flanel ing", price: 9990, image: "shirt3.jpg", category_id: 1, description: "Meleg és stílusos, tökéletes választás hűvösebb napokra." },
-
-                        // Zakók (Category 2)
-                        { name: "Fekete zakó", price: 24990, image: "jacket1.jpg", category_id: 2, description: "Modern szabású, karcsúsított zakó elegáns eseményekre." },
-                        { name: "Szürke sportzakó", price: 21990, image: "jacket2.jpg", category_id: 2, description: "Elegáns, mégis könnyed megjelenést biztosít." },
-                        { name: "Sötétkék blézer", price: 26990, image: "jacket3.jpg", category_id: 2, description: "Klasszikus darab, amely minden ruhatár alapja." },
-
-                        // Nadrágok (Category 3)
-                        { name: "Kék farmer nadrág", price: 12990, image: "pants1.jpg", category_id: 3, description: "Kényelmes, strapabíró farmer nadrág mindennapi használatra." },
-                        { name: "Bézs chino nadrág", price: 11990, image: "pants2.jpg", category_id: 3, description: "Elegáns és kényelmes, tökéletes irodai viselet." },
-                        { name: "Fekete szövetnadrág", price: 14990, image: "pants3.jpg", category_id: 3, description: "Hivatalos eseményekre ajánlott, prémium anyagból." },
-
-                        // Cipők (Category 4)
-                        { name: "Férfi bőr cipő", price: 19990, image: "shoes1.jpg", category_id: 4, description: "Valódi bőrből készült, kényelmes talpbetéttel rendelkező cipő." },
-                        { name: "Fehér sportcipő", price: 15990, image: "shoes2.jpg", category_id: 4, description: "Trendi és kényelmes, mindennapi rohangáláshoz." },
-                        { name: "Futócipő", price: 18990, image: "shoes3.jpg", category_id: 4, description: "Könnyű szerkezet, kiváló ütéscsillapítás sportoláshoz." }
-                    ];
-
-                    const stmt = db.prepare("INSERT INTO products (name, price, image, category_id, description) VALUES (?, ?, ?, ?, ?)");
-                    products.forEach(p => {
-                        stmt.run(p.name, p.price, p.image, p.category_id, p.description);
-                    });
-                    stmt.finalize();
-                    console.log("Termékek sikeresen feltöltve!");
-=======
                         { name: "Fehér elegáns ing", price: 9990, image: "shirt1.jpg", category_id: 1, description: "Prémium minőségű pamut ing, alkalmi és hétköznapi viseletre is.", sizes: "S,M,L,XL,XXL", stock: JSON.stringify({S: 5, M: 3, L:8, XL: 2, XXL: 1}) },
                         { name: "Kék lezser ing", price: 7990, image: "shirt2.jpg", category_id: 1, description: "Kényelmes viselet, ideális hétvégi programokhoz.", sizes: "S,M,L,XL,XXL", stock: JSON.stringify({S: 5, M: 3, L:8, XL: 2, XXL: 1}) },
                         { name: "Kockás flanel ing", price: 9990, image: "shirt3.jpg", category_id: 1, description: "Meleg és stílusos, tökéletes választás hűvösebb napokra.", sizes: "S,M,L,XL,XXL", stock: JSON.stringify({S: 5, M: 3, L:8, XL: 2, XXL: 1}) },
@@ -301,7 +238,6 @@ function initDb() {
                             }
                         });
                     });
->>>>>>> webshop-backend-update
                 }
             });
         });
