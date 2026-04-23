@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const bcrypt = require("bcrypt");
 
 const dbPath = path.resolve(__dirname, 'webshop.db');
 
@@ -20,13 +21,33 @@ function initDb() {
         // Users tábla
         db.run(`CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            email TEXT UNIQUE,
-            password TEXT,
-            role TEXT
+            name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            role TEXT NOT NULL
         )`);
 
-
+        db.get("SELECT COUNT(*) AS count FROM users WHERE role = 'admin'", (err, row) => {
+            if (err) {
+                console.error("Hiba a kategóriák ellenőrzésekor:", err.message);
+                return;
+            }
+            if (row.count === 0) {
+                const hashedPassword = bcrypt.hashSync("Begin321!", 10);
+                const adminUser = ["Admin", "admin@webshop.hu", hashedPassword, "admin"] 
+                const upload = db.prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
+                upload.run(adminUser);
+                upload.finalize((err) => {
+                    if(err) {
+                        console.error("Hiba a kategóriák feltöltésekor:", err.message);
+                    } else {
+                        console.log("Admin profil létrehozva.");
+                        console.log("Admin email: admin@webshop.hu");
+                        console.log("Admin jelszó: Begin321!");
+                    }
+                });
+            }
+        });
         // User_profiles tábla
         db.run(`CREATE TABLE IF NOT EXISTS user_profiles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,12 +58,39 @@ function initDb() {
             address TEXT
         )`);
 
+        db.run(`CREATE TABLE IF NOT EXISTS idempotency_keys (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            key_value TEXT UNIQE,
+            order_id INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
         // Category tábla
         
         db.run(`CREATE TABLE IF NOT EXISTS category (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT
         )`);
+        
+         db.get("SELECT COUNT(*) as count FROM category", (err, row) => {
+            if (err) {
+                console.error("Hiba a kategóriák ellenőrzésekor:", err.message);
+                return;
+            }
+            if (row.count === 0) {
+                const categories = [{name: "Rendeléssel kapcsolatos kérdés"}, {name: "Szállításról érdeklődnék"}, {name: "Termék visszaküldése/csere"}, {name: "Egyéb"}];
+                const upload = db.prepare("INSERT INTO category (name) VALUES (?)");
+                categories.forEach(category => {
+                    upload.run(category.name);
+                });
+                upload.finalize((err) => {
+                    if(err) {
+                        console.error("Hiba a kategóriák feltöltésekor:", err.message);
+                    } else {
+                        console.log("Kapcsolat kategóriái sikeresen feltöltve.");
+                    }
+                });
+            }
+        });
 
         // Contact tábla
         
@@ -100,13 +148,11 @@ function initDb() {
                 return;
             }
 
-            // Vendég email mező hozzáadva
             // Orders tábla
             db.run(`CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NULL,
             user_email TEXT,
-            guest_email TEXT NULL,
             total_price INTEGER,
             status TEXT DEFAULT 'pending',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -139,6 +185,10 @@ function initDb() {
 
             // Ha üres a products tábla, töltsük fel
             db.get("SELECT count(*) as count FROM products", (err, row) => {
+                if (err) {
+                    console.error(err.message);
+                    return;
+                }
                 if (row.count === 0) {
                     console.log("Termékek feltöltése...");
                     const products = [

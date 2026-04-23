@@ -66,12 +66,12 @@
                         </div>
                         <div class="form-group">
                             <label for="edit-phone">Telefonszám</label>
-                            <input type="text" id="edit-phone" placeholder="+36 30 123 4567">
+                            <input type="te" id="edit-phone" placeholder="+36 30 123 4567" inputmode="tel" oninput="this.value = this.value.replace(/(?!^\+)[^0-9]/g, '');">
                         </div>
 
                         <div class="form-group">
                             <label for="edit-zip">Irányítószám</label>
-                            <input type="text" id="edit-zip" placeholder="1051">
+                            <input type="Text" id="edit-zip" placeholder="1051" maxlength="4" pattern="[0-9]{4}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                         </div>
 
                         <div class="form-group">
@@ -120,7 +120,7 @@
             <div class="footer-section">
                 <h4>Gyors Linkek</h4>
                 <ul>
-                    <li><a href="/index">Főoldal</a></li>
+                    <li><a href="/">Főoldal</a></li>
                     <li><a href="/cart">Kosár</a></li>
                     <li><a href="/login">Bejelentkezés</a></li>
                     <li><a href="/register">Regisztráció</a></li>
@@ -150,7 +150,6 @@
     <!-- Értesítések helye -->
     <div id="toast-container" class="toast-container"></div>
 
-    <script src="/static/js/products_data.js?v=1.2"></script>
     <script src="/static/js/common.js?v=11"></script>
     <script src="/static/js/profile.js"></script>
 </body>

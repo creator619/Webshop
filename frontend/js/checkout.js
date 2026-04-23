@@ -1,7 +1,24 @@
 // ==========================================
 // PÉNZTÁR ÉS RENDELÉS LEADÁSA
 // ==========================================
+function generateIdempotencyKey() {
+    if (window.crypto && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
 
+    if (window.crypto && crypto.getRandomValues) {
+        const arr = new Uint32Array(4);
+        crypto.getRandomValues(arr);
+
+        return (
+            Date.now() + "-" +
+            Array.from(arr).map(n => n.toString(16)).join("")
+        );
+    }
+
+    return Date.now() + "-" + Math.random().toString(36).slice(2, 12);
+}
+const idempotencyKey = generateIdempotencyKey();
 if (window.location.pathname.includes("/checkout")) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     const container = document.getElementById("checkout-items");
@@ -75,8 +92,18 @@ if (window.location.pathname.includes("/checkout")) {
 
     // Rendelés leadása gomb
     const orderBtn = document.querySelector(".place-order-btn");
+
+    let currentIdempotencyKey = generateIdempotencyKey();
+    let orderInProgress = false;
+
     if (orderBtn) {
         orderBtn.addEventListener("click", async () => {
+            if (orderInProgress) {
+                return; 
+            }
+            
+          
+
             const name = document.getElementById("name").value;
             const email = document.getElementById("email").value;
             const phone = document.getElementById("phone").value;
@@ -90,7 +117,8 @@ if (window.location.pathname.includes("/checkout")) {
                 showToast("Kérlek tölts ki minden mezőt!");
                 return;
             }
-
+            orderInProgress = true;
+            orderBtn.disabled = true;
             try {
                 // Az új backend más adatszerkezetet vár: meglévő nevet és árat is el kell küldeni
                 const orderData = {
@@ -107,21 +135,26 @@ if (window.location.pathname.includes("/checkout")) {
                         price: item.price,
                         quantity: item.quantity || 1,
                         size: item.size || null
-                    }))
+                    })),
+                    idempotencyKey: currentIdempotencyKey
                 };
 
                 const result = await apiFetch('/orders', {
                     method: 'POST',
                     body: JSON.stringify(orderData)
                 });
-                
                 showToast("Rendelés sikeresen leadva!");
                 localStorage.removeItem("cart"); // Kosár ürítése
                 setTimeout(() => {
-                    window.location.href = `/order-success?id=${result.orderId}`;
+                    
+                    window.location.href = `/order-success?id=${result.data.orderId}`;
                 }, 1500);
             } catch (err) {
                 console.error(err);
+
+                orderInProgress = false;
+                orderBtn.disabled = false;
+                currentIdempotencyKey = generateIdempotencyKey();
                 showToast("Hiba történt a rendelés leadásakor: " + (err.message || "Ismeretlen hiba"));
             }
         });

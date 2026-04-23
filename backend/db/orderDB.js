@@ -170,5 +170,5 @@ module.exports = {
     getIdempotencyKey,
     saveIdempotencyKey,
     getOrdersMy,
-    getOrders
+    getOrders,
 }

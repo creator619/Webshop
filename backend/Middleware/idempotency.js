@@ -1,14 +1,6 @@
 
 const recentRequests = new Map();
 
-function createRequestKey(userId, body) {
-    return JSON.stringify({
-        userId,
-        items: body.items,
-        email: body.email,
-        total: body.total_price
-    });
-}
 
 function isDuplicateRequest(key) {
 
@@ -25,4 +17,4 @@ function isDuplicateRequest(key) {
     return false;
 }
 
-module.exports = { isDuplicateRequest, createRequestKey };
+module.exports = { isDuplicateRequest };

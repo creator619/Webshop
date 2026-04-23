@@ -1,13 +1,15 @@
 const { validateOrderPostSync, prepareOrderItems} = require("../validators/orderValidator")
 const { saveOrder, getIdempotencyKey, saveIdempotencyKey, getOrders, getOrdersMy} = require("../db/orderDB");
-const {isDuplicateRequest, createRequestKey} = require("../Middleware/idempotency");
+const {isDuplicateRequest} = require("../Middleware/idempotency");
 
 async function serviceOrder(userData, body) {  
     let user_id = userData ? userData.id : null;
-    const requestKey = createRequestKey(user_id, body);
+    const idempotencyKey = body.idempotencyKey;
 
-
-    if (isDuplicateRequest(requestKey)) {
+    if (!idempotencyKey) {
+        throw new Error("Hiányzó idempotency kulcs");
+    }
+    if (isDuplicateRequest(idempotencyKey)) {
         throw new Error("Dupla rendelés érzékelve (5s védelem)");
     }
 
@@ -22,7 +24,7 @@ async function serviceOrder(userData, body) {
 
     const orderId = await saveOrder(saveData);
 
-    await saveIdempotencyKey(requestKey, orderId);
+    const test = await saveIdempotencyKey(idempotencyKey, orderId);
 
     return { orderId };
 }

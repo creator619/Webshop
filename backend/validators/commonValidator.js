@@ -25,9 +25,24 @@ function isValidDescription(description) {
    return true;
 }
 
+function isValidMessage(message) {
+   if (typeof message !== "string") return "Az üzenetnek szövegből kell állnia!";
+   if(message.length < 10) return "Az üzenet túl rövid! (min. 10 karakter)";
+   if (message.length > 1000) return "Az üzenet túl hosszú! (max. 1000 karakter)";
+
+   return null;
+}
+
+
 function isValidEmail(email) {
-    //const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const regex = /^[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    const regex = /^[A-Za-z0-9._+-]+@([A-Za-z0-9]+(-[A-Za-z0-9]+)*\.)+[A-Za-z]{2,}$/;
+                  
+    if (email.includes("..")) {
+        return false;
+    }
+
+    if (email.startsWith(".") || email.startsWith("_") ||email.startsWith("+") || email.startsWith("-")) return false;
+
     return regex.test(email);
 }
 
@@ -37,4 +52,4 @@ function isValidName(name) {
     return regex.test(name);
 }
 
-module.exports = { isValidStatus, isValidTotalPrice, isValidId, isValidImage, isValidDescription, isValidEmail, isValidName};
+module.exports = { isValidStatus, isValidTotalPrice, isValidId, isValidImage, isValidDescription, isValidEmail, isValidName, isValidMessage};

@@ -7,18 +7,25 @@ const { isValidEmail, isValidName } = require("./commonValidator");
 function validateOrderPostSync(data) {
     if (!data.email || !data.phone || !data.zip || !data.city || !data.address || !data.name) return "Minden mező kitöltése kötelező!";
     
+    if (data.email.length > 50) return "Az email túl hosszú!";
     if (!isValidEmail(data.email)) return "Az email formátuma nem megfelelő!";
 
     if (!isValidName(data.name)) return "A név nem megfelelő!";
-    if (data.name.length > 100) return "A név túl hosszú!";
+    if (data.name.length > 50) return "A név túl hosszú!";
    
-    if (!isValidPhone(data.phone)) return "Nem megfelelő telefonszám!";
+    const phoneError = isValidPhone(data.phone);
+    if (phoneError) return phoneError;
+
+    if (data.city.length < 3) return "A városnév csak is 3-50 karakterből állhat!";
     if (!isValidZip(data.zip)) return "Az irányítószám csak is szám lehet!";
     if (data.zip.length !== 4) return "Az irányítószámnak 4 karakterből kell állnia!";
-    if (!isValidCity(data.city)) return "A város nem tartalmazhat számokat/karaktereket!";
+    const cityError = isValidCity(data.city);
+    if (cityError) return cityError;
     if (data.city.length > 50) return "A város neve túl hosszú!";
-    if(!isValidAddress(data.address)) return "A cím formátuma nem megfelelő!";
-    if (data.address.length > 100) return "A cím túl hosszú!";
+
+    const addressError = isValidAddress(data.address);
+    if (addressError) return addressError;
+
     if (!Array.isArray(data.items) || data.items.length === 0) return "Hiányzó kosár tartalom.";
     
     return null;

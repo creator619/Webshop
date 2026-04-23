@@ -7,34 +7,60 @@ const {updateUserName, updateUserProfile}  = require("../db/authDB")
 
 
 function isValidPhone(phone) {
-    const regex = /^\+?\d{6,15}$/;
-    return regex.test(phone);
+    const regex = /^\+?\d+$/;
+    if (!regex.test(phone)) return `A telefonszám csak számokat és "+" jelet tartalmazhat!`;
+
+    if (!phone.startsWith('06') && !phone.startsWith("+36")) return "A telefonszámnak +36-tal vagy 06-tal kell kezdődnie!";
+    if (phone.length < 10 || phone.length > 12) return "A telefonszám hossza nem megfelelő! (10-12 karakter)!";
+    
+    return null;
 }
 function isValidZip(zip) {
     const regex = /^[\d]+$/;
     return regex.test(zip);
 }
 function isValidCity(city) {
-    const regex = /^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s]{4,}$/;
-    return regex.test(city);
+    const regex = /^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s]{2,}$/;
+    
+    if (!regex.test(city)) return "A város nem tartalmazhat számokat/karaktereket!";
+
+    if (city.includes("  ")) return "A város nem tartalmazhat dupla szóközt!";
+
+    
+    return null;
 }
 
 function isValidAddress(address) {
-    const regex = /^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s\d._,-]{4,}$/;
-    return regex.test(address);
+    const regex = /^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s\d._,-]{3,}$/;
+    if (!regex.test(address)) return "A cím csak betükből, számokból és [._,-]-karakterekből állhat!";
+
+    if (address.includes("..") || address.includes("__") || address.includes(",,") || address.includes("--")) return "Különleges karakter csakis önállóan használható!";
+
+    if (address.length < 4) return "A cím túl rövid!";
+    if (address.length > 50) return "A cím túl hosszú!";
+
+    return null;
 }
 
 function isValidProfileSync(data) {
     if (!data.phone || !data.zip || !data.city || !data.address || !data.name) return "Minden mező kitöltése kötelező!";
-    if (!isValidPhone(data.phone)) return "Nem megfelelő telefonszám!";
+    if (data.name.length < 4) return "A névnek minimum 4 karakterből kell állnia!";
+    if(!isValidName(data.name)) return "A név csak is betűkből állhat!";
+    if (data.name.includes("  ")) return "A név nem tartalmazhat dupla szóközt!";
+    if (data.name.length > 50) return "A név túl hosszú!";
+    const phoneError = isValidPhone(data.phone);
+    if (phoneError) return phoneError;
     if (!isValidZip(data.zip)) return "Az irányítószám csak is szám lehet!";
     if (data.zip.length !== 4) return "Az irányítószámnak 4 karakterből kell állnia!";
-    if (!isValidCity(data.city)) return "A város nem tartalmazhat számokat/karaktereket!";
+    if (data.city.length < 3) return "A városnév csak is 3-50 karakterből állhat!";
+    const cityError = isValidCity(data.city);
+    if (cityError) return cityError;
     if (data.city.length > 50) return "A város neve túl hosszú!";
-    if(!isValidAddress(data.address)) return "A cím formátuma nem megfelelő!";
-    if (data.address.length > 100) return "A cím túl hosszú!";
-    if(!isValidName(data.name)) return "A név nem megfelelő!";
-    if (data.name.length > 100) return "A név túl hosszú!";
+    
+    const addressError = isValidAddress(data.address);
+    if (addressError) return addressError;
+
+
 
     return null;
 }

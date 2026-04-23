@@ -3,11 +3,18 @@ const router = express.Router();
 const authMiddleware = require("../Middleware/authMiddleware");
 const optionalAuth = require("../Middleware/optionalAuth");
 const adminMiddleware = require("../Middleware/adminMiddleware");
+const rateLimit = require("express-rate-limit");
+
+const orderLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 perc
+    max: 5, // max 5 request
+    message: { message:"Túl sok próbálkozás, próbáld újra később!"}
+});
 
 
 const { serviceOrder, serviceCategoriesGet, serviceCategoriesGetMy } = require("../service/orderService");
 
-router.post("/", optionalAuth, async (req, res) => {
+router.post("/", optionalAuth, orderLimiter, async (req, res) => {
     try {
         const result = await serviceOrder(req.user, req.body);
         res.json({
@@ -49,12 +56,5 @@ router.get("/my", authMiddleware, async (req, res) => {
         });
     }
 });
-
-// A) Rate limiter
-//B) Idempotency key
-// 3. 5 mp duplikáció védelem Ha nincs idempotency
-// Quantity limit – jól látod
-// . Admin stock edit
-
 
 module.exports = router;

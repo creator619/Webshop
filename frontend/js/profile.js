@@ -154,6 +154,11 @@ async function saveProfileChanges() {
     };
 
     // Irányítószám validáció
+    if (!updatedData.name || !updatedData.phone || !updatedData.zip || !updatedData.city || !updatedData.address) {
+        showToast("Kérlek tölts ki minden mezőt!");
+        return;
+    }
+
     if (!/^\d{4}$/.test(updatedData.zip)) {
         showToast("Hibás irányítószám!");
         return;

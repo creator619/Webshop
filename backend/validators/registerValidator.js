@@ -12,10 +12,10 @@ function isValidPassword(password) {
 function validateRegisterSync(data) {
     if (!data.email || !data.name || !data.password) return "Minden mező kitöltése kötelező!";
     if (data.name.length < 4) return "A név túl rövid!";
-    if (data.name.length > 100) return "A név túl hosszú!";
-    if (data.email.length > 100) return "Az email túl hosszú!";
-    if (data.password.length > 100) return "A jelszó túl hosszú!";
-    if (!isValidEmail(data.email)) return "Hibás email";
+    if (data.name.length > 50) return "A név túl hosszú!";
+    if (data.email.length > 50) return "Az email túl hosszú!";
+    if (data.password.length > 50) return "A jelszó túl hosszú!";
+    if (!isValidEmail(data.email)) return "Hibás email!";
     if (!isValidName(data.name)) return "A név nem megfelelő!";
     if (!isValidPassword(data.password)) return "A jelszónak tartalmaznia kell kis és nagy betűket, számokat és karaktereket!";
 
@@ -26,7 +26,7 @@ async function validateRegisterAsync(data) {
     const taken = await isEmailTaken(data.email);
 
     if (taken) {
-        return "Az email már létezik";
+        return "Az email már létezik!";
     }
     return null;
 }
