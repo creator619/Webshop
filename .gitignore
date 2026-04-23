@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 node_modules/
 backend/
 .env
+=======
+>>>>>>> webshop-backend-update
 *.sqlite
 .DS_Store

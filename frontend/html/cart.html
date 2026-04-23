@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kosár</title>
+    <link rel="stylesheet" href="/static/css/common.css?v=11">
+    <link rel="stylesheet" href="/static/css/cart.css?v=11">
+</head>
+
+<body>
+    <!-- Főmenü navigáció -->
+    <nav class="menu">
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">☰</button>
+        <ul id="main-menu">
+            <li><a href="/">Főoldal</a></li>
+            <!-- Kosár gomb a menüben, mutatja a benne lévő tételek számát -->
+            <li class="cart-menu">
+                <a href="/cart">Kosár<span id="cart-count">(0)</span></a> 
+            </li>
+            <!-- Ide kerül bejelentkezve a profil/kijelentkezés gomb -->
+            <div id="user-nav" class="user-status"></div>
+        </ul>
+    </nav>
+
+    <!-- Kosár oldal fő tartalma -->
+    <main class="cart-page">
+        <h1>Kosár tartalma</h1>
+        
+        <!-- Ez a konténer üres alapból, a script.js fogja feltölteni a tételekkel -->
+        <div id="cart-items"></div>
+
+        <!-- Összegzés szekció: végösszeg és fizetés gomb -->
+        <div class="cart-summary">
+            <h2>Végösszeg: <span id="cart-total">0 Ft</span></h2>
+            <button class="checkout-btn" onclick="window.location.href='/checkout'">Tovább a rendeléshez</button>
+        </div>
+    </main>
+
+    <!-- Ingyenes szállításról tájékoztató banner -->
+    <div class="shipping-banner">
+        <span>🚚 10.000 Ft felett <strong>INGYENES</strong> a szállítás!</span>
+    </div>
+
+    <!-- Weboldal lábléce (ugyanaz mint az index.html-en) -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <!-- Bemutatkozás -->
+            <div class="footer-section">
+                <h4>Rólunk</h4>
+                <p>Prémium férfiruha webshop, ahol a stílus és a minőség találkozik. Válogatott kollekcióinkkal
+                    segítünk, hogy minden alkalommal a legjobb formádat hozhasd.</p>
+            </div>
+            <!-- Oldaltérkép -->
+            <div class="footer-section">
+                <h4>Gyors Linkek</h4>
+                <ul>
+                    <li><a href="/">Főoldal</a></li>
+                    <li><a href="/cart">Kosár</a></li>
+                    <li><a href="/login">Bejelentkezés</a></li>
+                    <li><a href="/register">Regisztráció</a></li>
+                </ul>
+            </div>
+            <!-- Információk -->
+            <div class="footer-section">
+                <h4>Ügyfélszolgálat</h4>
+                <ul>
+                    <li><a href="/contact">Szállítási információk</a></li>
+                    <li><a href="/contact">Gyakori kérdések</a></li>
+                    <li><a href="/contact">Visszaküldés</a></li>
+                    <li><a href="/contact">Kapcsolatfelvétel</a></li>
+                </ul>
+            </div>
+            <!-- Elérhetőségek -->
+            <div class="footer-section">
+                <h4>Kapcsolat</h4>
+                <p>Email: info@webshop.hu</p>
+                <p>Telefon: +36 30 123 4567</p>
+                <p>Cím: 1051 Budapest, Fashion utca 12.</p>
+            </div>
+        </div>
+        <!-- Szerzői jogi információ -->
+        <div class="footer-bottom">
+            <p>&copy; 2024 Ruházati Webshop - Minden jog fenntartva.</p>
+        </div>
+    </footer>
+    <!-- Felugró értesítések helye -->
+    <div id="toast-container" class="toast-container"></div>
+    
+    <!-- Külső könyvtárak és saját scriptek -->
+    <script src="/static/js/common.js?v=11"></script>
+    <script src="/static/js/cart.js?v=2"></script>
+</body>
+
+</html>
+

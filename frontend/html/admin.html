@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Webshop</title>
+    <link rel="stylesheet" href="/static/css/common.css?v=11">
+    <link rel="stylesheet" href="/static/css/admin.css?v=11">
+    <!-- Chart.js a grafikonokhoz -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Felső navigációs sáv az adminisztrátorok számára -->
+    <div class="admin-nav">
+        <h2>Admin Panel</h2>
+        <div class="tab active" data-tab="dashboard">Irányítópult</div>
+        <div class="tab" data-tab="orders">Rendelések</div>
+        <div class="tab" data-tab="products">Termékek</div>
+        <div class="tab" data-tab="messages">Üzenetek</div>
+                <div id="user-nav" class="user-status"></div>
+                <button onclick="window.location.href='/'" class="btn-add btn-back">Vissza a bolthoz</button>
+    </div>
+
+    <div class="admin-container">
+        <!-- IRÁNYÍTÓPULT TAB: Statisztikák megjelenítése -->
+        <div id="dashboard-tab" class="tab-content">
+            <h3>Üdvözöljük az Admin felületen!</h3>
+            <div class="stats-grid">
+                <!-- Bevétel kártya -->
+                <div class="stat-card">
+                    <h4>Összes bevétel</h4>
+                    <p id="stat-revenue">0 Ft</p>
+                </div>
+                <!-- Rendelések kártya -->
+                <div class="stat-card">
+                    <h4>Rendelések száma</h4>
+                    <p id="stat-orders">0 db</p>
+                </div>
+                <!-- Vásárlók kártya -->
+                <div class="stat-card">
+                    <h4>Vásárlók száma</h4>
+                    <p id="stat-customers">0 fő</p>
+                </div>
+            </div>
+
+            <!-- GRAFIKONOK SZÉKCIÓ -->
+            <div class="charts-section">
+                <div class="chart-container">
+                    <h4>Kategória megoszlás</h4>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Heti bevételi trend (Ft)</h4>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- RENDELÉSEK TAB: Beérkezett rendelések kezelése -->
+        <div id="orders-tab" class="tab-content" style="display: none;">
+            <div class="table-responsive">
+                <table id="admin-orders-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Vevő</th>
+                            <th>Összeg</th>
+                            <th>Szállítás</th>
+                            <th>Dátum</th>
+                            <th>Státusz</th>
+                            <th>Művelet</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-tbody">
+                        <!-- A JavaScript ide tölti be a rendeléseket -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TERMÉKEK TAB: Termékek kezelése (Hozzáadás, Szerkesztés, Törlés) -->
+        <div id="products-tab" class="tab-content" style="display: none;">
+            <div class="section-header">
+                <h3>Termékek kezelése</h3>
+                <button class="btn-add" onclick="showProductForm()">+ Új termék</button>
+            </div>
+
+            <!-- Termék űrlap: Új termék felvételéhez vagy meglévő szerkesztéséhez -->
+            <div id="product-form" class="admin-form">
+                <h4 id="form-title">Új termék hozzáadása</h4>
+                <input type="hidden" id="p-id"> <!-- Rejtett mező az azonosítónak szerkesztéskor -->
+                <input type="text" id="p-name" placeholder="Termék neve">
+                <input type="number" id="p-price" placeholder="Ár (Ft)">
+                
+                <!-- Kép kezelése: URL megadása vagy fájl feltöltése -->
+                <div class="image-upload-row">
+                    <input type="text" id="p-image" placeholder="Kép URL (vagy tölts fel egyet)" class="no-margin-bottom">
+                    <input type="file" id="p-upload" style="display: none;" onchange="uploadImage(this)">
+                    <button type="button" class="btn-add btn-upload" onclick="document.getElementById('p-upload').click()">Feltöltés</button>
+                </div>
+                
+                <!-- Kategória választó -->
+                <select id="p-category" required onchange="generateAdminSizeInputs()">
+                    <option value="">Válassz kategóriát...</option>
+                    <option value="1">Ing</option>
+                    <option value="2">Zakó</option>
+                    <option value="3">Nadrág</option>
+                    <option value="4">Cipő</option>
+                </select>
+
+                <!-- Méretenkénti készlet (dinamikusan generálva a kategória alapján) -->
+                <div class="size-stock-container">
+                    <label>Készlet méretenként:</label>
+                    <div id="admin-size-inputs">
+                        <span class="size-stock-hint">Kérlek válassz először kategóriát!</span>
+                    </div>
+                </div>
+                
+                <textarea id="p-desc" placeholder="Leírás"></textarea>
+                
+                <button class="btn-add" onclick="saveProduct()">Mentés</button>
+                <button class="btn-add btn-cancel" onclick="hideProductForm()">Mégse</button>
+            </div>
+
+            <!-- Termékeket felsoroló táblázat -->
+            <div class="table-responsive">
+                <table id="admin-products-table">
+                    <thead>
+                        <tr>
+                            <th>Kép</th>
+                            <th>Név</th>
+                            <th>Ár</th>
+                            <th>Készlet</th>
+                            <th>Kategória</th>
+                            <th>Műveletek</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-tbody">
+                        <!-- A JavaScript ide tölti be a termékeket -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ÜZENETEK TAB: Ügyfél üzenetek kezelése -->
+        <div id="messages-tab" class="tab-content" style="display: none;">
+            <h3>Ügyfél üzenetek</h3>
+            <div class="table-responsive">
+                <table id="admin-messages-table">
+                    <thead>
+                        <tr>
+                            <th>Dátum</th>
+                            <th>Név</th>
+                            <th>E-mail</th>
+                            <th>Tárgy</th>
+                            <th>Üzenet</th>
+                            <th>Művelet</th>
+                        </tr>
+                    </thead>
+                    <tbody id="messages-table-body">
+                        <!-- Ide kerülnek az üzenetek -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Értesítések (toast) tárolója -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Szükséges szkriptek -->
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/admin.js?v=10"></script>
+</body>
+</html>
