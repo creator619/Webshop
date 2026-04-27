@@ -2,7 +2,7 @@
 
 Ez egy komplett ruházati webáruház projekt, amely egy Node.js alapú backend szolgáltatásból és egy modern, reszponzív frontend felületből áll. Az alkalmazás modern technológiákat használ a biztonságos és gyors vásárlási élmény érdekében.
 
-## 🚀 Funkciók
+## Funkciók
 
 - **Felhasználói Kezelés**: Regisztráció, biztonságos bejelentkezés (JWT), és profil adatok szerkesztése.
 - **Termékkatalógus**: Termékek böngészése, keresés és kategóriák szerinti szűrés.
@@ -11,7 +11,7 @@ Ez egy komplett ruházati webáruház projekt, amely egy Node.js alapú backend 
 - **Admin Felület**: Termékek, kategóriák és rendelések kezelése az adminisztrátorok számára.
 - **Biztonság**: Jelszó hashelés (bcrypt), JWT-alapú hitelesítés, és kérésszám-korlátozás (rate limiting).
 
-## 🛠 Technológiai Stack
+## Technológiai Stack
 
 - **Backend**: Node.js, Express.js
 - **Adatbázis**: SQLite3 (helyi fájl alapú adatbázis)
@@ -19,7 +19,7 @@ Ez egy komplett ruházati webáruház projekt, amely egy Node.js alapú backend 
 - **Frontend**: HTML5, Vanilla CSS, Modern JavaScript
 - **Biztonság**: Bcrypt (jelszó titkosítás), Express Rate Limit
 
-## 📦 Telepítés és Futtatás
+## Telepítés és Futtatás
 
 ### 1. Előfeltételek
 Győződj meg róla, hogy a [Node.js](https://nodejs.org/) telepítve van a gépeden.
@@ -45,14 +45,14 @@ A szerver automatikusan detektálja a helyi IP-címedet, és kiírja, hogy hol �
 ### 4. Frontend elérése
 A frontendet a backend szerver szolgálja ki statikusan. A böngészőben nyisd meg a szerver által kiírt címet.
 
-## 📂 Projekt Felépítése
+## Projekt Felépítése
 
 - `/backend`: Az API szerver, útvonalak (routes), adatbázis kapcsolat és logika.
 - `/frontend`: A felhasználói felület (HTML, CSS, JS fájlok).
 - `/export.sql`: Az adatbázis sémája és kezdő adatai.
 - `/images`: A termékekhez tartozó képfájlok tárolóhelye.
 
-## 📝 Dokumentáció
+## Dokumentáció
 A projekt részletes dokumentációit a gyökérkönyvtárban található `.docx` fájlokban találod:
 - `webshop_vizsgaremek.docx`: Általános leírás és követelmények.
 - `ER_diagram_webshop.docx`: Adatbázis szerkezeti terve.
