@@ -1,10 +1,10 @@
-// Átirányítás
+/* --- BEJELENTKEZÉS --- */
 
 if (localStorage.getItem("user")) {
     window.location.href="/";
 }
 
-// Bejelentkezés logikája
+/* Bejelentkezés logikája */
 if (window.location.pathname.includes("/login")) {
     const loginBtn = document.getElementById("login-btn");
     if (loginBtn) {
@@ -18,7 +18,7 @@ if (window.location.pathname.includes("/login")) {
             }
 
             try {
-                // Bejelentkezési adatok küldése a saját backendnek
+                /* Bejelentkezési adatok küldése a saját backendnek */
                 const response = await fetch(`${BASE_URL}/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -31,7 +31,7 @@ if (window.location.pathname.includes("/login")) {
                     throw new Error(data.message || data.error || "Sikertelen bejelentkezés");
                 }
 
-                // Bejelentkezés után a tokent és a felhasználói adatokat tároljuk
+                /* Bejelentkezés után a tokent és a felhasználói adatokat tároljuk */
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
                 

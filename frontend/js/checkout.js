@@ -1,6 +1,4 @@
-// ==========================================
-// PÉNZTÁR ÉS RENDELÉS LEADÁSA
-// ==========================================
+/* --- PÉNZTÁR ÉS RENDELÉS LEADÁSA --- */
 function generateIdempotencyKey() {
     if (window.crypto && crypto.randomUUID) {
         return crypto.randomUUID();
@@ -24,7 +22,7 @@ if (window.location.pathname.includes("/checkout")) {
     const container = document.getElementById("checkout-items");
     let total = 0;
 
-    // Összegző feltöltése termékekkel
+    /* Összegző feltöltése termékekkel */
     if (container) {
         container.innerHTML = "";
         cart.forEach(item => {
@@ -40,21 +38,19 @@ if (window.location.pathname.includes("/checkout")) {
 
         const totalLabel = document.getElementById("checkout-total");
 
-        /**
-         * Kiszámolja a végösszeget a szállítási díjjal együtt.
-         */
+        /* Kiszámolja a végösszeget a szállítási díjjal együtt. */
         function updateCheckoutTotal() {
             const shippingMethod = document.querySelector('input[name="shipping"]:checked')?.value || 'home';
             let shippingFee = 0;
 
-            // 10.000 Ft alatt szállítási díjat számítunk fel
+            /* 10.000 Ft alatt szállítási díjat számítunk fel */
             if (total < 10000) {
                 shippingFee = (shippingMethod === 'home') ? 1500 : 990;
             }
 
             const finalTotal = total + shippingFee;
             
-            // Szállítási díj sor megjelenítése/frissítése
+            /* Szállítási díj sor megjelenítése/frissítése */
             let shippingDisplay = document.getElementById("shipping-fee-display");
             if (!shippingDisplay) {
                 shippingDisplay = document.createElement("div");
@@ -77,20 +73,20 @@ if (window.location.pathname.includes("/checkout")) {
 
         updateCheckoutTotal();
 
-        // Szállítási mód váltásakor újraszámoljuk az árat
+        /* Szállítási mód váltásakor újraszámoljuk az árat */
         document.querySelectorAll('input[name="shipping"]').forEach(input => {
             input.addEventListener('change', updateCheckoutTotal);
         });
     }
 
-    // Alapadatok kitöltése, ha a felhasználó be van jelentkezve
+    /* Alapadatok kitöltése, ha a felhasználó be van jelentkezve */
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
         if (document.getElementById("name")) document.getElementById("name").value = user.name;
         if (document.getElementById("email")) document.getElementById("email").value = user.email;
     }
 
-    // Rendelés leadása gomb
+    /* Rendelés leadása gomb */
     const orderBtn = document.querySelector(".place-order-btn");
 
     let currentIdempotencyKey = generateIdempotencyKey();
@@ -102,8 +98,6 @@ if (window.location.pathname.includes("/checkout")) {
                 return; 
             }
             
-          
-
             const name = document.getElementById("name").value;
             const email = document.getElementById("email").value;
             const phone = document.getElementById("phone").value;
@@ -120,7 +114,7 @@ if (window.location.pathname.includes("/checkout")) {
             orderInProgress = true;
             orderBtn.disabled = true;
             try {
-                // Az új backend más adatszerkezetet vár: meglévő nevet és árat is el kell küldeni
+                /* Az új backend más adatszerkezetet vár: meglévő nevet és árat is el kell küldeni */
                 const orderData = {
                     name: name,
                     email: email,
@@ -128,7 +122,7 @@ if (window.location.pathname.includes("/checkout")) {
                     address: address,
                     zip: zip,
                     city: city,
-                    total_price: updateCheckoutTotal(), // kiszámoljuk a végösszeget
+                    total_price: updateCheckoutTotal(), 
                     items: cart.map(item => ({
                         id: item.id,
                         name: item.name,
@@ -144,7 +138,7 @@ if (window.location.pathname.includes("/checkout")) {
                     body: JSON.stringify(orderData)
                 });
                 showToast("Rendelés sikeresen leadva!");
-                localStorage.removeItem("cart"); // Kosár ürítése
+                localStorage.removeItem("cart");
                 setTimeout(() => {
                     
                     window.location.href = `/order-success?id=${result.data.orderId}`;

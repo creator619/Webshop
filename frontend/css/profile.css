@@ -1,6 +1,4 @@
-/* ==========================================
-   Profil oldal (profile.html) stílusok
-   ========================================== */
+/* --- Profil oldal (profile.html) stílusok --- */
 
 .profile-hero {
     background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/images/hatter.jpg');

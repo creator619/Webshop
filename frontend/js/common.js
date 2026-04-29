@@ -1,10 +1,8 @@
-// ==========================================
-// KONFIGURÁCIÓ
-// ==========================================
+/* --- KONFIGURÁCIÓ --- */
 let BASE_URL = "";
 let API_URL = "";
 
-// induláskor lekérjük
+/* induláskor lekérjük */
 async function initConfig() {
     const res = await fetch("/config");
     const data = await res.json();
@@ -15,12 +13,9 @@ async function initConfig() {
     console.log("BASE_URL:", BASE_URL);
 }
 
-// ezt hívd meg induláskor
 initConfig();
 
-/**
- * Segédfüggvény a termékképek elérési útjának meghatározásához.
- */
+/* Segédfüggvény a termékképek elérési útjának meghatározásához. */
 function getProductImage(imagePath) {
     if (!imagePath) return `${BASE_URL}/images/hatter.jpg`;
     if (imagePath.startsWith('http')) return imagePath;
@@ -29,16 +24,13 @@ function getProductImage(imagePath) {
     return imagePath;
 }
 
-/**
- * Ellenőrzi a bejelentkezési állapotot a LocalStorage-ból,
- * és frissíti a fejlécben található navigációs gombokat (Login helyett Profil/Admin).
- */
+/* Ellenőrzi a bejelentkezési állapotot és frissíti a fejlécben található navigációs gombokat (Login helyett Profil/Admin). */
 function updateAuthUI() {
     const user = JSON.parse(localStorage.getItem("user"));
     const userNav = document.getElementById("user-nav");
 
     if (user && userNav) {
-        // Az új backend 'role' mezőt használ 'is_admin' helyett
+        /* Az új backend 'role' mezőt használ 'is_admin' helyett */
         const isAdmin = user.role === 'admin' || user.is_admin;
         const adminLink = isAdmin ? `<span class="username" onclick="window.location.href='/admin'" style="color: var(--accent); margin-right: 15px;">⚙️ Admin</span>` : '';
         userNav.innerHTML = `
@@ -56,9 +48,7 @@ function updateAuthUI() {
     }
 }
 
-/**
- * Kijelentkezés: törli a felhasználói adatokat és visszairányít a főoldalra.
- */
+/* Kijelentkezés: törli a felhasználói adatokat és visszairányít a főoldalra. */
 function logout() {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
@@ -68,11 +58,11 @@ function logout() {
     }, 1000);
 }
 
-// Alapvető UI események (pl. mobil menü, kategória váltás, GYIK) kezelése betöltéskor
+/* Alapvető UI események (pl. mobil menü, kategória váltás, GYIK) kezelése betöltéskor */
 document.addEventListener("DOMContentLoaded", () => {
     updateAuthUI();
 
-    // 1. Mobil menü nyitás/zárás kezelése
+    /*  Mobil menü nyitás/zárás kezelése */
     const toggleBtn = document.getElementById("mobile-menu-toggle");
     const menu = document.getElementById("main-menu");
     if (toggleBtn && menu) {
@@ -82,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 2. Menü kattintások (kategória váltás / navigáció) kezelése
+    /*  Menü kattintások (kategória váltás / navigáció) kezelése */
     if (menu) {
         menu.addEventListener("click", (e) => {
             const item = e.target.closest("li");
@@ -91,33 +81,31 @@ document.addEventListener("DOMContentLoaded", () => {
             const cat = item.getAttribute("data-category");
             const isMainPage = window.location.pathname.endsWith("/") || window.location.pathname === "/" || window.location.pathname.endsWith("/");
 
-            // ez itt nem lesz jó
             if (cat !== null) {
                 if (isMainPage && typeof applyFilters === 'function') {
                     const isAlreadyAcitve = item.classList.contains("active");
-                    // Ha a főoldalon vagyunk, aktiváljuk a szűrőt
-                    // minden active törlése
+                    /* Ha a főoldalon vagyunk, aktiváljuk a szűrőt és alkalmazzuk */
                     document.querySelectorAll(".menu li").forEach(li => li.classList.remove("active"));
 
-                    //ha NEM volt aktív -> újra aktiváljuk
+                    /* Ha NEM volt aktív -> újra aktiváljuk */
                     if (!isAlreadyAcitve) {
                         item.classList.add("active");
                     }
                     applyFilters();
                 } else {
-                    // Ha más oldalon vagyunk, visszairányítjuk a főoldalra a kategória paraméterrel
+                    /* Ha más oldalon vagyunk, visszairányítjuk a főoldalra a kategória paraméterrel */
                     const targetCat = cat || "";
                     window.location.href = `/${targetCat ? `?category=${targetCat}` : ""}`;
                 }
 
-                // Mobil menü bezárása kattintás után
+                /* Mobil menü bezárása kattintás után */
                 menu.classList.remove("active");
                 if (toggleBtn) toggleBtn.textContent = "☰";
             }
         });
     }
 
-    // 3. GYIK Harmonika (Accordion) működése
+    /* GYIK működése */
     const faqItems = document.querySelectorAll('.faq-item');
     faqItems.forEach(item => {
         const questionBtn = item.querySelector('.faq-question');
@@ -132,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 4. Kapcsolati űrlap kezelése
+    /* Kapcsolati űrlap kezelése */
     const contactForm = document.getElementById('contact-form');
     const statusMsg = document.getElementById('contact-status');
 
@@ -151,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
             submitBtn.textContent = 'Küldés folyamatban...';
             submitBtn.disabled = true;
 
-            // Valódi backend kérés
+            /* Valódi backend kérés */
             apiFetch('/contact', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -191,15 +179,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// ==========================================
-// API FETCH ÉS SEGÉDFÜGGVÉNYEK
-// ==========================================
+/* --- API FETCH ÉS SEGÉDFÜGGVÉNYEK --- */
 
-// A SUPABASE INICIALIZÁLÁS ELTÁVOLÍTVA - Mostantól saját MySQL backendünket használjuk
-
-/**
- * Segédfüggvény az API hívásokhoz (automatikusan hozzáadja a tokent).
- */
+/* Segédfüggvény az API hívásokhoz (automatikusan hozzáadja a tokent). */
 async function apiFetch(endpoint, options = {}) {
     const token = localStorage.getItem('token');
     const headers = {
@@ -215,19 +197,19 @@ async function apiFetch(endpoint, options = {}) {
     }
     const data = await response.json();
 
-    // Adat tisztítás és transformáció a SQLite backendhez
+    /* Adat tisztítás és transformáció a SQLite backendhez */
     if (Array.isArray(data)) {
         data.forEach(item => {
-            // sizes string (S,M,L) -> size_stocks objektum ({S:10, M:10, L:10})
+            /* sizes string (S,M,L) -> size_stocks objektum ({S:10, M:10, L:10}) */
             if (item && item.sizes && !item.size_stocks) {
                 const sizeArr = item.sizes.split(',');
                 item.size_stocks = {};
-                sizeArr.forEach(s => item.size_stocks[s.trim()] = 10); // Alapértelmezett készlet, mivel nincs a táblában
+                sizeArr.forEach(s => item.size_stocks[s.trim()] = 10);
                 item.stock = sizeArr.length * 10;
             }
         });
     } else if (data) {
-        // Egyedi termék vagy login válasz esetén
+        /* Egyedi termék vagy login válasz esetén */
         if (data.sizes && !data.size_stocks) {
             const sizeArr = data.sizes.split(',');
             data.size_stocks = {};
@@ -239,13 +221,9 @@ async function apiFetch(endpoint, options = {}) {
     return data;
 }
 
-// ==========================================
-// TERMÉKEK MEGJELENÍTÉSE ÉS LEKÉRÉSE
-// ==========================================
+/* ---TERMÉKEK MEGJELENÍTÉSE ÉS LEKÉRÉSE --- */
 
-/**
- * A kapott terméklistát HTML kártyákká alakítja és beszúrja a megadott konténerbe.
- */
+/* A kapott terméklistát HTML kártyákká alakítja és beszúrja a megadott konténerbe. */
 function renderProducts(list, containerId = "product-list") {
     const container = document.getElementById(containerId) || document.getElementById("wishlist-list") || document.getElementById("related-list");
     if (!container) return;
@@ -266,7 +244,7 @@ function renderProducts(list, containerId = "product-list") {
         const imgSrc = getProductImage(p.image);
         const currentStock = (p.stock === null || p.stock === undefined) ? 10 : p.stock;
 
-        // Készlet állapot szövegezése
+        /* Készlet állapot szövegezése */
         const stockStatus = currentStock > 0 ? `<p class="stock-info">Készleten: ${currentStock} db</p>` : `<p class="stock-info out-of-stock">Elfogyott</p>`;
         const disableClass = currentStock > 0 ? '' : 'disabled';
 
@@ -285,14 +263,12 @@ function renderProducts(list, containerId = "product-list") {
     });
 }
 
-/**
- * Termékek lekérése a saját API-ról.
- */
+/* Termékek lekérése a saját API-ról. */
 async function fetchProducts() {
     try {
         const data = await apiFetch('/products');
 
-        // Statikus kiegészítések (pl. választható méretek) hozzáfűzése a backend adatokhoz
+        /* Statikus kiegészítések (pl. választható méretek) hozzáfűzése a backend adatokhoz */
         const mergedData = data.map(p => {
             const staticInfo = (typeof productsData !== 'undefined') ? productsData.find(sp => sp.id === p.id) : null;
             return {
@@ -305,7 +281,7 @@ async function fetchProducts() {
         renderProducts(mergedData);
     } catch (error) {
         console.warn("Hiba a termékek letöltésekor, statikus adatok használata:", error);
-        // Tartalék megoldás: ha a szerver nem érhető el, a products_data.js-ből dolgozunk
+        /* Tartalék megoldás: ha a szerver nem érhető el, a products_data.js-ből dolgozunk */
         if (typeof productsData !== 'undefined') {
             window.allProducts = productsData;
             renderProducts(productsData);
@@ -315,18 +291,16 @@ async function fetchProducts() {
     }
 }
 
-// Kezdő lekérés indítása, ha van terméklista az oldalon
-// Ha olyan oldalon vagyunk, ahol szükség van termékadatokra, töltsük le őket
+/* Kezdő lekérés indítása, ha van terméklista az oldalon */
+/* Ha olyan oldalon vagyunk, ahol szükség van termékadatokra, töltsük le őket */
 if (document.getElementById("product-list") || document.getElementById("wishlist-list")) {
     fetchProducts();
 }
 
-/**
- * Egy konkrét termék részletes oldalának megnyitása.
- */
+/* Egy konkrét termék részletes oldalának megnyitása. */
 async function openProduct(id) {
     try {
-        // Megpróbáljuk lekérni az API-ról a legfrissebb adatot
+        /* Megpróbáljuk lekérni az API-ról a legfrissebb adatot */
         const data = await apiFetch(`/products/${id}`);
 
         const staticInfo = (typeof productsData !== 'undefined') ? productsData.find(sp => sp.id === data.id) : null;
@@ -339,7 +313,7 @@ async function openProduct(id) {
         window.location.href = "/product";
     } catch (err) {
         console.error("Hiba a termék részleteinek lekérésekor:", err);
-        // Hiba esetén megpróbáljuk a már korábban betöltött listából kikeresni
+        /* Hiba esetén megpróbáljuk a már korábban betöltött listából kikeresni */
         const product = window.allProducts?.find(p => p.id === id);
         if (product) {
             localStorage.setItem("selectedProduct", JSON.stringify(product));
@@ -348,13 +322,9 @@ async function openProduct(id) {
     }
 }
 
-// ==========================================
-// KOSÁR ÉS KÍVÁNSÁGLISTA KEZELÉSE
-// ==========================================
+/* --- KOSÁR ÉS KÍVÁNSÁGLISTA KEZELÉSe --- */
 
-/**
- * Frissíti a menüben a kosár melletti számot (tételek összesítése).
- */
+/* Frissíti a menüben a kosár melletti számot (tételek összesítése). */
 function updateCartCount() {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     const count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
@@ -364,13 +334,11 @@ function updateCartCount() {
     }
 }
 
-/**
- * Termék hozzáadása a kosárhoz.
- */
+/* Termék hozzáadása a kosárhoz. */
 function addToCart(product, quantity = 1) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    // Készlet ellenőrzése
+    /* Készlet ellenőrzése */
     let availableStock = 0;
     const sizeStocks = product.size_stocks || {};
 
@@ -380,10 +348,10 @@ function addToCart(product, quantity = 1) {
     }
 
     if (sizeStocks[product.size] !== undefined) {
-        // Csak azt engedjük, ami a konkrét mérethez van írva
+        /* Csak azt engedjük, ami a konkrét mérethez van írva */
         availableStock = sizeStocks[product.size];
     } else {
-        // Ha nem szerepel a listában a méret -> 0 db
+        /* Ha nem szerepel a listában a méret -> 0 db */
         availableStock = 0;
     }
 
@@ -392,7 +360,7 @@ function addToCart(product, quantity = 1) {
         return;
     }
 
-    // Ha ugyanaz a termék ugyanabban a méretben már benne van, csak a mennyiséget növeljük
+    /* Ha ugyanaz a termék ugyanabban a méretben már benne van, csak a mennyiséget növeljük */
     const existingItem = cart.find(item => item.id === product.id && item.size === product.size);
 
     if (existingItem) {
@@ -412,27 +380,23 @@ function addToCart(product, quantity = 1) {
     updateCartCount();
 }
 
-/**
- * Gyors vásárlás a főoldalról (alapértelmezett méret választása).
- */
+/* Gyors vásárlás a főoldalról (alapértelmezett méret választása). */
 function addToCartOnMain(product) {
-    // Alapértelmezett méret keresése a készlet alapján
+    /* Alapértelmezett méret keresése a készlet alapján */
     const sizeStocks = product.size_stocks || {};
     const availableSizes = Object.keys(sizeStocks).filter(s => sizeStocks[s] > 0);
     
     if (availableSizes.length > 0) {
-        product.size = availableSizes[0]; // Az első elérhető méret
+        product.size = availableSizes[0];
         addToCart(product, 1);
     } else {
         showToast("Sajnos ez a termék jelenleg minden méretben elfogyott.");
     }
 }
 
-/**
- * Kedvencek (Kívánságlista) ki-be kapcsolása.
- */
+/* Kedvencek (Kívánságlista) ki-be kapcsolása. */
 function toggleWishlist(event, productId) {
-    event.stopPropagation(); // Ne nyissa meg a termékoldalt a kártyára kattintás miatt
+    event.stopPropagation();
 
     let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
     const index = wishlist.indexOf(productId);
@@ -454,12 +418,9 @@ function toggleWishlist(event, productId) {
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
 }
 
-// Kezdő számláló frissítése
 updateCartCount();
 
-/**
- * Üzenet megjelenítése (Toast)
- */
+/* Üzenet megjelenítése (Toast) */
 function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -468,14 +429,14 @@ function showToast(message, type = 'success') {
     toast.className = `toast ${type}`;
     toast.innerText = message;
     
-    // Egyedi szín hiba esetén
+    /* Egyedi szín hiba esetén */
     if (type === 'error') {
         toast.style.borderLeft = "4px solid #e74c3c";
     }
 
     container.appendChild(toast);
 
-    // Eltávolítás 3 másodperc után, finom elsötétedéssel
+    /* Eltávolítás 3 másodperc után, finom elsötétedéssel */
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(100%)';

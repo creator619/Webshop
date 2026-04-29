@@ -1,10 +1,8 @@
-/* ==========================================
-   Termék részletek oldal (product.html) stílusok
-   ========================================== */
+/* --- Termék részletek oldal (product.html) stílusok --- */
 
 .product-page {
     max-width: 1200px;
-    margin: 40px auto; /* Reduced margin */
+    margin: 40px auto;
     padding: 0 20px;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -13,7 +11,7 @@
     animation: fadeInUp 0.8s ease;
 }
 
-/* --- Termék Kép szekció --- */
+/* Termék Kép szekció */
 .product-image {
     position: sticky;
     top: 100px;
@@ -32,7 +30,7 @@
     transform: scale(1.02);
 }
 
-/* --- Termék Infó szekció --- */
+/* Termék Infó szekció */
 .product-info {
     display: flex;
     flex-direction: column;
@@ -83,7 +81,7 @@
     color: #e74c3c;
 }
 
-/* --- Méretválasztó --- */
+/* Méretválasztó */
 .size-selection h3, 
 .quantity-selection h3 {
     font-size: 1rem;
@@ -125,7 +123,7 @@
     color: rgba(255,255,255,0.8) !important;
 }
 
-/* --- Mennyiség --- */
+/* Mennyiség */
 .qty-input {
     width: 80px;
     padding: 12px;
@@ -141,7 +139,7 @@
     border-color: var(--accent);
 }
 
-/* --- Kosárba gomb --- */
+/* Kosárba gomb */
 .add-to-cart {
     margin-top: 20px;
     padding: 18px 40px;
@@ -168,7 +166,7 @@
     cursor: not-allowed;
 }
 
-/* --- Kapcsolódó termékek --- */
+/* Kapcsolódó termékek */
 .related-products {
     max-width: 1200px;
     margin: 100px auto;
@@ -179,7 +177,7 @@
     margin-bottom: 50px;
 }
 
-/* --- Szállítási banner --- */
+/* Szállítási banner */
 .shipping-banner {
     background: #f0f0f0;
     padding: 20px;
@@ -194,7 +192,7 @@
     color: var(--accent);
 }
 
-/* --- Reszponzivitás --- */
+/* Reszponzivitás */
 @media (max-width: 968px) {
     .product-page {
         grid-template-columns: 1fr;
@@ -207,7 +205,7 @@
     }
 
     .product-info h1 {
-        font-size: 1.8rem; /* Further reduced for readability */
+        font-size: 1.8rem;
     }
 
     .product-info {

@@ -1,8 +1,4 @@
-// ==========================================
-// KOSÁR KEZELÉSE
-// ==========================================
-
-// A globális kosárkezelő függvények (addToCart, updateCartCount) már a common.js-ben vannak.
+/* --- KOSÁR KEZELÉSE --- */
 
 if (window.location.pathname.includes("/cart")) {
     renderCart();
@@ -43,12 +39,12 @@ function renderCart() {
             });
         }
 
-        // Végösszeg és ingyenes szállítás kalkuláció
+        /* Végösszeg és ingyenes szállítás kalkuláció */
         const totalSpan = document.getElementById("cart-total");
         if (totalSpan) {
             totalSpan.textContent = total.toLocaleString() + " Ft";
             
-            // Ingyenes szállítás info megjelenítése
+            /* Ingyenes szállítás info megjelenítése */
             const summaryDiv = document.querySelector(".cart-summary");
             if (summaryDiv) {
                 let shippingInfo = document.getElementById("cart-shipping-info");
@@ -61,7 +57,7 @@ function renderCart() {
                 }
                 
                 if (total >= 10000) {
-                    shippingInfo.innerHTML = "🎉 <strong>Ingyenes szállítás!</strong>";
+                    shippingInfo.innerHTML = " <strong>Ingyenes szállítás!</strong>";
                     shippingInfo.style.color = "var(--accent)";
                 } else {
                     const diff = 10000 - total;
@@ -84,13 +80,13 @@ function renderCart() {
     }
 }
 
-// Mennyiség módosítása a kosárban
+/* Mennyiség módosítása a kosárban */
 async function changeQuantity(index, delta) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     const item = cart[index];
     
     if (item) {
-        // Ha növelni akarjuk a darabszámot, ellenőrizzük a készletet
+        /* Ha növelni akarjuk a darabszámot, ellenőrizzük a készletet */
         if (delta > 0) {
             try {
                 const product = await apiFetch(`/products/${item.id}`);
@@ -104,7 +100,7 @@ async function changeQuantity(index, delta) {
                 }
             } catch (error) {
                 console.error("Hiba a készlet ellenőrzésekor:", error);
-                // Hiba esetén (pl. nincs net) a biztonság kedvéért nem engedjük a növelést
+                /* Hiba esetén (pl. nincs net) a biztonság kedvéért nem engedjük a növelést */
                 showToast("Hiba történt a készlet ellenőrzésekor.", "error");
                 return;
             }
@@ -113,7 +109,7 @@ async function changeQuantity(index, delta) {
         item.quantity = (item.quantity || 1) + delta;
         
         if (item.quantity < 1) {
-            removeItem(index); // Ha 0 lenne a darabszám, töröljük
+            removeItem(index);
             return;
         }
         localStorage.setItem("cart", JSON.stringify(cart));
@@ -122,7 +118,7 @@ async function changeQuantity(index, delta) {
     }
 }
 
-// Termék törlése a kosárból
+/* Termék törlése a kosárból */
 function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     cart.splice(index, 1);

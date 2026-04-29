@@ -1,4 +1,5 @@
 /* --- Termékek --- */
+
 .section-title {
     text-align: center;
     margin: 60px 0 30px;
@@ -20,7 +21,7 @@
     margin: 15px auto 0;
 }
 
-/* --- Szűrő és Rendezés sáv --- */
+/* Szűrő és Rendezés sáv */
 .filter-bar {
     display: flex;
     flex-wrap: wrap;
@@ -30,7 +31,7 @@
     padding: 25px 35px;
     margin: 0 auto 40px;
     max-width: 1200px;
-    width: 100%; /* Changed from 90% for better mobile fit */
+    width: 100%; 
     border-radius: 16px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
     border: 1px solid rgba(0, 0, 0, 0.04);
@@ -94,7 +95,7 @@
     font-weight: 700;
 }
 
-/* --- Terméklista rács --- */
+/* Terméklista rács */
 .products {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -267,7 +268,7 @@
     }
     .filter-group.search-group {
         max-width: none;
-        order: -1; /* Search first on mobile */
+        order: -1; 
     }
     .search-wrapper input {
         padding: 12px 15px 12px 45px;

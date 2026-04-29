@@ -1,7 +1,5 @@
 const jwt = require("jsonwebtoken");
 
-// teszt
-//Ne adjon hibát, ha nincs token
 
 function optionalAuth(req, res, next) {
     const authHeader = req.headers.authorization;

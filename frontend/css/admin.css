@@ -12,7 +12,7 @@
     white-space: nowrap;
 }
 
-/* Scrollbar elrejtése a navigációnál, de működőképes marad */
+/* Scrollbar elrejtése a navigációnál */
 .admin-nav::-webkit-scrollbar {
     display: none;
 }
@@ -52,7 +52,6 @@
 }
 
 /* Táblázat stílusok a rendelésekhez és termékekhez */
-/* Reszponzív táblázat konténer */
 .table-responsive {
     width: 100%;
     overflow-x: auto;
@@ -66,7 +65,7 @@
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 600px; /* Biztosítja a táblázat olvashatóságát görgetéskor */
+    min-width: 600px;
 }
 
 th, td {
@@ -151,7 +150,7 @@ th {
     border-radius: 8px;
     margin-bottom: 30px;
     box-shadow: var(--shadow);
-    display: none; /* Alapértelmezetten rejtett */
+    display: none;
 }
 
 .admin-form input, .admin-form textarea, .admin-form select {
@@ -199,7 +198,7 @@ th {
     margin-bottom: 0 !important;
 }
 
-/* Méret készlet tároló */
+/* Méret tároló */
 .size-stock-container {
     margin-bottom: 15px;
     background: #f9f9f9;
@@ -226,7 +225,7 @@ th {
     font-size: 0.9rem;
 }
 
-/* Media Queries */
+/* Media  */
 @media (max-width: 768px) {
     .admin-nav {
         padding: 10px 15px;

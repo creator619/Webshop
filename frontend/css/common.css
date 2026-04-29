@@ -1,6 +1,4 @@
-/* ==========================================
-   Dizájn Rendszer és Alapbeállítások (Közös)
-   ========================================== */
+/* --- Dizájn Rendszer és Alapbeállítások (Közös) --- */
 
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap');
 
@@ -27,18 +25,16 @@
 
 * {
     box-sizing: border-box;
-    /* Méretezési modell korrekciója */
 }
 
 body {
     margin: 0;
     padding: 0;
     font-family: 'Lato', sans-serif;
-    /* Alapértelmezett betűtípus */
     background: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.6;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-x: hidden;
 }
 
 main {
@@ -55,22 +51,20 @@ h1,
 h2,
 h3 {
     font-family: 'Playfair Display', serif;
-    /* Címsorok elegáns betűtípusa */
     color: var(--primary);
     margin-top: 0;
 }
 
-/* --- Főmenü navigáció --- */
+/* Főmenü navigáció */
 .mobile-menu-toggle {
     display: none;
-    /* Asztali gépen ne legyen látható */
     background: transparent;
     border: none;
     font-size: 1.8rem;
     color: var(--primary);
     cursor: pointer;
     position: absolute;
-    right: 20px; /* Moved to right for better thumb reach */
+    right: 20px;
     top: 50%;
     transform: translateY(-50%);
     padding: 10px;
@@ -129,7 +123,6 @@ h3 {
 /* Felső navigációs gombok (Bejelentkezés/Regisztráció/Kosár) */
 .user-status {
     display: contents;
-    /* Így a belső li-k a fő ul flex-gyermekei lesznek */
 }
 
 .nav-btn {
@@ -177,7 +170,7 @@ h3 {
 }
 
 
-/* --- Footer (Lábléc) --- */
+/* Footer (Lábléc) */
 .site-footer {
     background-color: var(--primary);
     color: #bbb;
@@ -366,14 +359,13 @@ h3 {
     transform: translateY(-1px);
 }
 
-/* --- Hero szekció (Közös) --- */
+/* Hero szekció (Közös) */
 .hero {
     background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('/images/hatter.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     height: 70vh;
-    /* Alapértelmezett magasság */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -429,11 +421,11 @@ h3 {
     color: var(--accent);
 }
 
-/* Back to Top gomb */
+/* Vissza gomb */
 .back-to-top {
     position: fixed;
     bottom: 30px;
-    left: 30px; /* Bal oldalon, hogy ne ütközzön a toast üzenetekkel */
+    left: 30px; 
     width: 45px;
     height: 45px;
     background: var(--primary);

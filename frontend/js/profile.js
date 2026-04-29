@@ -1,6 +1,4 @@
-// ==========================================
-// PROFIL ADATOK ÉS RENDELÉSI ELŐZMÉNYEK
-// ==========================================
+/* --- PROFIL ADATOK ÉS RENDELÉSI ELŐZMÉNYEK --- */
 
 if (window.location.pathname.includes('/profile')) {
 
@@ -14,14 +12,14 @@ if (window.location.pathname.includes('/profile')) {
     } else {
         loadUserProfile();
 
-        // Szerkesztés gomb eseménykezelő
+        /* Szerkesztés gomb eseménykezelő */
         const editBtn = document.getElementById('edit-profile-btn');
         if (editBtn) {
             editBtn.addEventListener('click', () => toggleEditForm(true));
         }
 
         const ordersList = document.getElementById('orders-list');
-        // Rendelések lekérése a backendről
+        /* Rendelések lekérése a backendről */
         apiFetch('/orders/my')
             .then(userOrders => {
                 if (ordersList) {
@@ -72,9 +70,8 @@ if (window.location.pathname.includes('/profile')) {
     }
 }
 
-/**
- * Profil szerkesztése űrlap ki/be kapcsolása.
- */
+
+/* Profil szerkesztése űrlap ki/be kapcsolása. */
 function toggleEditForm(show) {
     const form = document.getElementById('edit-profile-form');
     const user = JSON.parse(localStorage.getItem('user'));
@@ -92,7 +89,7 @@ function toggleEditForm(show) {
     }
 }
 
-// Profiladatok betöltése:
+/* Profiladatok betöltése */
 
 async function loadUserProfile() {
     try {
@@ -127,7 +124,7 @@ async function loadUserProfile() {
             `;
         }
 
-        // 👉 ELTESSZÜK localStorage-be is (frissítjük)
+        /* ELTESSZÜK localStorage-be is (frissítjük) */
         const user = JSON.parse(localStorage.getItem("user")) || {};
         const updatedUser = { ...user, ...data };
         localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -138,9 +135,7 @@ async function loadUserProfile() {
     }
 }
 
-/**
- * Módosított profiladatok mentése.
- */
+/* Módosított profiladatok mentése. */
 async function saveProfileChanges() {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user) return;
@@ -153,7 +148,7 @@ async function saveProfileChanges() {
         address: document.getElementById('edit-address').value
     };
 
-    // Irányítószám validáció
+    /* Irányítószám validáció */
     if (!updatedData.name || !updatedData.phone || !updatedData.zip || !updatedData.city || !updatedData.address) {
         showToast("Kérlek tölts ki minden mezőt!");
         return;
@@ -174,7 +169,7 @@ async function saveProfileChanges() {
             body: JSON.stringify(updatedData)
         });
 
-        // Frissítjük a localStorage-t is
+        /* Frissítjük a localStorage-t is */
         const updatedUser = { ...user, ...profile };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         

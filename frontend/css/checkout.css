@@ -1,4 +1,5 @@
 /* --- Checkout (Pénztár) oldal --- */
+
 .checkout-page {
     padding: 60px 5%;
     max-width: 1200px;
@@ -90,7 +91,7 @@
     box-shadow: var(--shadow);
 }
 
-/* Egyéni rádiógombok a szállításnál és fizetésnél */
+/* Egyéni gombok a szállításnál és fizetésnél */
 .radio-container {
     display: block;
     position: relative;

@@ -1,6 +1,4 @@
-// ==========================================
-// TERMÉK RÉSZLETEK ÉS HASONLÓ TERMÉKEK
-// ==========================================
+/* --- TERMÉKEK --- */
 
 if (window.location.pathname.includes("/product")) {
     let product = JSON.parse(localStorage.getItem("selectedProduct"));
@@ -15,7 +13,7 @@ if (window.location.pathname.includes("/product")) {
         const stockDetail = document.getElementById("product-stock-detail");
         const addToCartBtn = document.querySelector(".add-to-cart");
 
-        // Készletinformáció kezelése
+        /* Készletinformáció kezelése */
         if (stockDetail) {
             if (product.stock !== undefined && product.stock > 0) {
                 stockDetail.textContent = `Készleten: ${product.stock} db`;
@@ -36,7 +34,7 @@ if (window.location.pathname.includes("/product")) {
             }
         }
 
-        // Méretválasztó gombok generálása
+        /* Méretválasztó gombok generálása */
         const sizeContainer = document.getElementById("size-options");
         if (sizeContainer && product.sizes) {
             sizeContainer.innerHTML = "";
@@ -45,19 +43,18 @@ if (window.location.pathname.includes("/product")) {
                 ? product.sizes
                 : product.sizes.split(",");
 
-            // Készletelosztás logikája (mivel a db nem tárol bontást, egy determinisztikus elosztást használunk)
+            /* Készletelosztás logikája (mivel a db nem tárol bontást, egy determinisztikus elosztást használunk) */
             product.sizes.forEach((size, index) => {
                 let sizeStock = 0;
                 
                 if (product.size_stocks && product.size_stocks[size] !== undefined) {
-                    // Valódi készletadat a DB-ből
+                    /* Valódi készletadat a DB-ból */
                     sizeStock = product.size_stocks[size];
                 } else {
-                    // SZIGORÚ LOGIN: Ha a méret nincs benne a JSON-ben, akkor nincs készlet (0 db)
+                    /* SZIGORÚ LOGIN: Ha a méret nincs benne a JSON-ben, akkor nincs készlet (0 db) */
                     sizeStock = 0;
                 }
 
-                // (Kiszedtük a demó célú kamu készlethiány generálót)
 
                 const btn = document.createElement("button");
                 btn.className = "size-btn";
@@ -79,15 +76,15 @@ if (window.location.pathname.includes("/product")) {
                     document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("active"));
                     btn.classList.add("active");
                     window.selectedSize = size; 
-                    window.selectedSizeStock = sizeStock; // Eltároljuk a választott méret készletét
+                    window.selectedSizeStock = sizeStock;
                     
-                    // Frissítjük a fő készletkijelzést is a választott mérethez
+                    /* Frissítjük a fő készletkijelzést is a választott mérethez */
                     if (stockDetail) {
                         stockDetail.textContent = `A kiválasztott méretből készleten: ${sizeStock} db`;
                         stockDetail.classList.remove("out-of-stock");
                     }
 
-                    // Korlátozzuk a mennyiségválasztót
+                    /* Korlátozzuk a mennyiségválasztót */
                     const qtyInput = document.getElementById("product-qty");
                     if (qtyInput) {
                         qtyInput.max = sizeStock;
@@ -107,7 +104,7 @@ if (window.location.pathname.includes("/product")) {
             });
         }
 
-        // Mennyiségválasztó mező figyelése (ne lehessen kézzel nagyobbat beírni)
+        /* Mennyiségválasztó mező figyelése (ne lehessen kézzel nagyobbat beírni) */
         const qtyInput = document.getElementById("product-qty");
         if (qtyInput) {
             qtyInput.addEventListener("change", () => {
@@ -121,7 +118,7 @@ if (window.location.pathname.includes("/product")) {
             });
         }
 
-        // Kosárba rakás eseménykezelő
+        /* Kosárba rakás eseménykezelő */
         if (addToCartBtn) {
             addToCartBtn.addEventListener("click", () => {
                 if (!window.selectedSize) {
@@ -141,22 +138,20 @@ if (window.location.pathname.includes("/product")) {
                     return;
                 }
 
-                // Létrehozzuk a termék objektumot a választott mérettel
+                /* Létrehozzuk a termék objektumot a választott mérettel */
                 const productWithSize = { ...product, size: window.selectedSize };
                 
-                // Meghívjuk a közös addToCart függvényt (common.js)
+                /* Meghívjuk a közös addToCart függvényt (common.js) */
                 addToCart(productWithSize, quantity);
             });
         }
 
-        // Kapcsolódó termékek (ugyanabból a kategóriából) megjelenítése
+        /* Kapcsolódó termékek (ugyanabból a kategóriából) megjelenítése */
         renderRelatedProducts(product);
     }
 }
 
-/**
- * Ugyanolyan kategóriájú termékek keresése és megjelenítése.
- */
+/* Ugyanolyan kategóriájú termékek keresése és megjelenítése. */
 function renderRelatedProducts(currentProduct) {
     const container = document.getElementById("related-list");
     if (!container || !window.allProducts) return;

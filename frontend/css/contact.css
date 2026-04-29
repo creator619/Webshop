@@ -1,10 +1,8 @@
-/* ==========================================
-   Ügyfélkapcsolati oldal (contact.html) stílusok
-   ========================================== */
+/* --- Ügyfélkapcsolati oldal (contact.html) stílusok --- */
 
 /* A tartalomrész grid elrendezése */
 .contact-main {
-    padding: 20px 15px; /* Reduced for mobile */
+    padding: 20px 15px;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -47,7 +45,7 @@
     line-height: 1.5;
 }
 
-/* GYIK Harmonika (Accordion) stílusok */
+/* GYIK stílusok */
 .faq-container {
     display: flex;
     flex-direction: column;
@@ -78,7 +76,7 @@
 }
 
 .faq-question::after {
-    content: '\002B'; /* Plusz jel */
+    content: '\002B';
     position: absolute;
     right: 20px;
     font-size: 20px;
@@ -90,7 +88,7 @@
 }
 
 .faq-item.active .faq-question::after {
-    content: '\2212'; /* Mínusz jel */
+    content: '\2212';
     transform: rotate(180deg);
 }
 
@@ -103,7 +101,7 @@
 }
 
 .faq-item.active .faq-answer {
-    max-height: 1000px; /* Elegendő hely a szövegnek */
+    max-height: 1000px;
     padding: 15px 20px;
 }
 

@@ -1,4 +1,4 @@
-// Globális változók a grafikonok tárolásához (hogy frissíthetőek legyenek)
+/* --- ADMIN --- */
 let categoryChartInstance = null;
 let revenueChartInstance = null;
 
@@ -8,9 +8,9 @@ if (!user || user.role !== "admin") {
     window.location.href="/";
 }
 
-// Az oldal betöltésekor lefutó fő inicializáló rész
+/* Az oldal betöltésekor lefutó fő inicializáló rész */
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Alapszintű ellenőrzés a localStorage-ból (gyors visszajelzés)
+    /* Alapszintű ellenőrzés a localStorage-ból (gyors visszajelzés) */
     const user = JSON.parse(localStorage.getItem('user'));
     
     if (!user) {
@@ -18,18 +18,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 2. Szerveroldali ellenőrzés a saját backendünkön keresztül
+    /* Szerveroldali ellenőrzés a saját backendünkön keresztül */
     try {
         let profile;
         try {
-            //Ennek mi a feladata?
             profile = await apiFetch('/profile');
         } catch (apiErr) {
             console.warn("Profil API nem érhető el, LocalStorage használata:", apiErr.message);
-            profile = user; // Fallback a bejelentkezéskor kapott adatokra
+            profile = user;
         }
 
-        // Az új backend 'role' mezőt használ
+        /* Az új backend 'role' mezőt használ */
         const isAdmin = profile && (profile.role === 'admin' || profile.is_admin == 1 || profile.is_admin === true);
         
         if (!isAdmin) {
@@ -37,54 +36,52 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error(`Jogosultsági hiba`);
         }
 
-        // Ha a szerver is megerősítette a jogosultságot, betölthetjük az adatokat
+        /* Ha a szerver is megerősítette a jogosultságot, betölthetjük az adatokat */
         loadOrders();       // Rendelések
         loadProducts();     // Termékek
         loadCategoriesAdmin(); // Kategóriák
         loadMessages(); // Üzenetek
         setupTabs();        // Fülek közötti navigáció beállítása
-        
-        // Megjegyzés: Az új backend nem támogatja a külön statisztika és üzenet funkciókat, 
-        // ezért ezeket az Irányítópulton belül kalkuláljuk vagy elrejtjük.
+    
         
     } catch (err) {
         console.error("Admin inicializálási hiba:", err.message);
         showToast('Hiba az admin felület betöltésekor: ' + err.message, 'error');
         
-        // Ha nem vagyunk bejelentkezve vagy nincs jogunk, irányítsunk vissza
+        /* Ha nem vagyunk bejelentkezve vagy nincs jogunk, irányítsunk vissza */
         if (err.message.includes("jogosultság") || err.message.includes("not defined")) {
             window.location.href = '/';
         }
     }
 });
 
-// A fülek (Irányítópult, Rendelések, Termékek) közötti váltás kezelése
+/* A fülek (Irányítópult, Rendelések, Termékek) közötti váltás kezelése */
 function setupTabs() {
     document.querySelectorAll('.admin-nav .tab').forEach(tab => {
         tab.addEventListener('click', () => {
-            // Aktív osztály eltávolítása minden fülről és tartalom elrejtése
+            /* Aktív osztály eltávolítása minden fülről és tartalom elrejtése */
             document.querySelectorAll('.admin-nav .tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
 
-            // Aktuális fül aktiválása
+            /* Aktuális fül aktiválása */
             tab.classList.add('active');
             const target = tab.getAttribute('data-tab');
             document.getElementById(`${target}-tab`).style.display = 'block';
 
-            // Adatok frissítése a fülre kattintáskor
-            if (target === 'dashboard') loadOrders(); // Dashboard mostantól a rendelésekből számol
+            /* Adatok frissítése a fülre kattintáskor */
+            if (target === 'dashboard') loadOrders(); 
             if (target === 'orders') loadOrders();
             if (target === 'products') loadProducts();
         });
     });
 }
 
-// Kategóriák betöltése a backendről a termék felvételi legördülő menübe
+/* Kategóriák betöltése a backendről a termék felvételi legördülő menübe */
 async function loadCategoriesAdmin() {
     try {
         const response = await apiFetch('/admin/product_categories');
         const categories = response.data;
-        //lekéri a categories adatokat, de nem írja ki sehol
+        /*lekéri a categories adatokat, de nem írja ki sehol */
         const select = document.getElementById('p-category');
         if (select) {
             select.innerHTML = '<option value="">Válassz kategóriát...</option>';
@@ -97,20 +94,20 @@ async function loadCategoriesAdmin() {
     }
 }
 
-// --- DASHBOARD: Statisztikai adatok számítása a rendelésekből ---
+/* --- DASHBOARD: Statisztikai adatok számítása a rendelésekből --- */
 function calculateStatsFromOrders(orders) {
     try {
         const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.total_price) || 0), 0);
         const totalOrders = orders.length;
         const totalCustomers = new Set(orders.map(o => o.user_email)).size;
 
-        // Alap kártyák frissítése
+        /* Alap kártyák frissítése */
         document.getElementById('stat-revenue').textContent = totalRevenue.toLocaleString() + ' Ft';
         document.getElementById('stat-orders').textContent = totalOrders + ' db';
         document.getElementById('stat-customers').textContent = totalCustomers + ' fő';
 
-        // Mivel az új backend nem ad kategória és trend adatokat, a grafikonokat elrejtjük 
-        // vagy alapértelmezett értékkel töltjük fel a modern megjelenés érdekében.
+        /* Mivel az új backend nem ad kategória és trend adatokat, a grafikonokat elrejtjük  */
+        /* vagy alapértelmezett értékkel töltjük fel a modern megjelenés érdekében. */
         const chartsContainer = document.querySelector('.charts-grid');
         if (chartsContainer) chartsContainer.style.opacity = "0.5";
     } catch (err) {
@@ -118,7 +115,7 @@ function calculateStatsFromOrders(orders) {
     }
 }
 
-// --- RENDELÉSEK: Rendelések listázása és kezelése ---
+/* --- RENDELÉSEK: Rendelések listázása és kezelése --- */
 async function loadOrders() {
     try {
         const orders = await apiFetch('/admin/orders');
@@ -129,14 +126,14 @@ async function loadOrders() {
 
         orders.forEach(o => {
             const date = new Date(o.created_at).toLocaleDateString('hu-HU');
-            // Rendelési tételek HTML listája
+            /* Rendelési tételek HTML listája */
             const itemsHtml = o.order_items ? o.order_items.map(item => `
                 <div style="font-size: 0.85rem; color: #666; margin-bottom: 2px;">
                     • ${item.product_name} ${item.size ? `<b>(${item.size})</b>` : ''} <span style="color: #444; font-weight: 500;">(${item.quantity} db)</span> — <b>${(item.price * item.quantity).toLocaleString()} Ft</b>
                 </div>
             `).join('') : 'Nincs adat';
 
-            // Sor hozzáadása a táblázathoz
+            /* Sor hozzáadása a táblázathoz */
             const shippingText = o.shipping_method === 'home' ? 'Házhoz' : (o.shipping_method === 'locker' ? 'Automata' : o.shipping_method || '-');
             const paymentText = o.payment_method === 'cod' ? 'Utánvét' : (o.payment_method === 'transfer' ? 'Átutalás' : o.payment_method || '-');
 
@@ -177,10 +174,10 @@ async function loadOrders() {
     }
 }
 
-// Rendelés státuszának frissítése (pl. függőben -> szállítva)
+/* Rendelés státuszának frissítése (pl. függőben -> szállítva) */
 async function updateOrderStatus(id, newStatus) {
     try {
-        // Az új backend PUT /admin/orders/:id útvonalat vár teljes objektummal
+        /* Az új backend PUT /admin/orders/:id útvonalat vár teljes objektummal */
         const orders = await apiFetch('/admin/orders');
         const order = orders.find(o => o.id === id);
         if (!order) throw new Error("Rendelés nem található");
@@ -201,7 +198,7 @@ async function updateOrderStatus(id, newStatus) {
     }
 }
 
-// Termékek listájának betöltése az admin táblázatba
+/* Termékek listájának betöltése az admin táblázatba */
 async function loadProducts() {
     try {
         const products = await apiFetch('/products');
@@ -211,7 +208,7 @@ async function loadProducts() {
         tbody.innerHTML = '';
 
         products.forEach(p => {
-            // Méretbontás szöveges megjelenítése a táblázatban
+            /* Méretbontás szöveges megjelenítése a táblázatban */
             let sizeSummary = '';
             if (p.size_stocks && typeof p.size_stocks === 'object') {
                 const parts = Object.entries(p.size_stocks)
@@ -240,19 +237,19 @@ async function loadProducts() {
     }
 }
 
-// Termékfelvételi űrlap megjelenítése
+/* Termékfelvételi űrlap megjelenítése */
 function showProductForm() {
     document.getElementById('product-form').style.display = 'block';
     document.getElementById('form-title').textContent = 'Új termék hozzáadása';
     clearForm();
 }
 
-// Űrlap elrejtése
+/* Űrlap elrejtése */
 function hideProductForm() {
     document.getElementById('product-form').style.display = 'none';
 }
 
-// Űrlap mezőinek kiürítése
+/* Űrlap mezőinek kiürítése */
 function clearForm() {
     document.getElementById('p-id').value = '';
     document.getElementById('p-name').value = '';
@@ -263,7 +260,7 @@ function clearForm() {
     document.getElementById('p-desc').value = '';
 }
 
-// Dinamikus méretmező generátor a kategória alapján
+/* Dinamikus méretmező generátor a kategória alapján */
 function generateAdminSizeInputs(productId = null) {
     const category = document.getElementById('p-category').value;
     const container = document.getElementById('admin-size-inputs');
@@ -273,10 +270,10 @@ function generateAdminSizeInputs(productId = null) {
         return;
     }
     
-    // Kategóriától függő méretlista
+    /* Kategóriától függő méretlista */
     let sizes = category == '4' ? ["40", "41", "42", "43", "44", "45"] : ["S", "M", "L", "XL", "XXL"];
     
-    // Meglévő adatok kinyerése a termékből (size_stocks oszlop a DB-ben)
+    /* Meglévő adatok kinyerése a termékből (size_stocks oszlop a DB-ben) */
     let customStocks = {};
     const product = window.allProducts?.find(p => p.id == productId);
     if (product && product.size_stocks) {
@@ -285,7 +282,7 @@ function generateAdminSizeInputs(productId = null) {
     
     container.innerHTML = '';
     sizes.forEach(size => {
-        // Alapértelmezett érték: ha új termék, 2-t teszünk bele, ha meglévő, akkor 0, de ha customStocks létezik, azt használjuk
+        /* Alapértelmezett érték: ha új termék, 2-t teszünk bele, ha meglévő, akkor 0, de ha customStocks létezik, azt használjuk */
         let defaultVal = customStocks[size] !== undefined ? customStocks[size] : (productId ? 0 : 2);
         container.innerHTML += `
             <div style="display: flex; flex-direction: column; width: 60px;">
@@ -296,7 +293,7 @@ function generateAdminSizeInputs(productId = null) {
     });
 }
 
-// Meglévő termék adatainak beöltése az űrlapba szerkesztéshez
+/* Meglévő termék adatainak beöltése az űrlapba szerkesztéshez */
 function editProduct(p) {
     document.getElementById('product-form').style.display = 'block';
     document.getElementById('form-title').textContent = 'Termék szerkesztése';
@@ -307,17 +304,17 @@ function editProduct(p) {
     document.getElementById('p-image').value = p.image;
     document.getElementById('p-category').value = p.category_id;
     
-    // Generáljuk a kategóriának megfelelő inputokat a meglévő termékhez
+    /* Generáljuk a kategóriának megfelelő inputokat a meglévő termékhez */
     generateAdminSizeInputs(p.id);
 
     document.getElementById('p-desc').value = p.description;
 }
 
-// Termék mentése (ha van ID, frissít, ha nincs, újat szúr be)
+/* Termék mentése (ha van ID, frissít, ha nincs, újat szúr be) */
 async function saveProduct() {
     const id = document.getElementById('p-id').value;
     
-    // Összeszeljük a méretenkénti készletet
+    /* Összeszeljük a méretenkénti készletet */
     const sizeInputs = document.querySelectorAll('.size-stock-input');
     let totalStock = 0;
     let sizeBreakdown = {};
@@ -362,14 +359,14 @@ async function saveProduct() {
 
         showToast(id ? 'Termék frissítve!' : 'Termék hozzáadva!');
         hideProductForm();
-        loadProducts(); // Lista frissítése
+        loadProducts(); 
     } catch (err) {
         console.error(err);
         showToast('Hiba a mentés során: ' + err.message);
     }
 }
 
-// Termék törlése
+/* Termék törlése */
 async function deleteProduct(id) {
     if (!confirm('Biztosan törlöd a terméket?')) return;
 
@@ -384,7 +381,7 @@ async function deleteProduct(id) {
     }
 }
 
-// --- ÜZENETEK: Ügyfél üzenetek listázása és kezelése ---
+/* --- ÜZENETEK: Ügyfél üzenetek listázása és kezelése --- */
 async function loadMessages() {
     try {
         const response = await apiFetch('/admin/contact');

@@ -1,4 +1,4 @@
-// Átirányítás
+/* --- REGISZTRÁCIÓ --- */
 
 const user = JSON.parse(localStorage.getItem("user"));
 
@@ -6,7 +6,7 @@ if (user) {
     window.location.href="/";
 }
 
-// Regisztráció logikája
+/* Regisztráció logikája */
 if (window.location.pathname.includes("/register")) {
     const regBtn = document.getElementById("register-btn");
     if (regBtn) {
@@ -21,7 +21,7 @@ if (window.location.pathname.includes("/register")) {
             }
 
             try {
-                // Regisztrációs adatok küldése a saját backendnek
+                /* Regisztrációs adatok küldése a saját backendnek */
                 const response = await fetch(`${BASE_URL}/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

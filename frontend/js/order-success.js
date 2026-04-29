@@ -1,9 +1,7 @@
-// ==========================================
-// SIKERES RENDELÉS VISSZAIGAZOLÁS
-// ==========================================
+/* --- SIKERES RENDELÉS VISSZAIGAZOLÁS --- */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Kiolvassuk az URL-ből a rendelési sorszámot
+    /* Kiolvassuk az URL-ből a rendelési sorszámot */
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id');
     

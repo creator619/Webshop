@@ -1,12 +1,9 @@
-﻿// ==========================================
-// KÍVÁNSÁGLISTA (WISHLIST)
-// ==========================================
+﻿/* --- KÍVÁNSÁGLISTA (WISHLIST) --- */
 
-/**
- * Termék hozzáadása vagy eltávolítása a kedvencek közül.
- */
+/* Termék hozzáadása vagy eltávolítása a kedvencek közül. */
+
 function toggleWishlist(event, productId) {
-    event.stopPropagation(); // Ne nyissa meg a termék oldalt kattintáskor
+    event.stopPropagation();
     let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
     const index = wishlist.indexOf(productId);
 
@@ -20,32 +17,30 @@ function toggleWishlist(event, productId) {
 
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
 
-    // Ha a kívánságlista oldalon vagyunk, azonnal újrarajzoljuk a listát
+    /* Ha a kívánságlista oldalon vagyunk, azonnal újrarajzoljuk a listát */
     if (window.location.pathname.includes('/wishlist')) {
         renderWishlist();
     } else {
-        // Különben csak frissítjük az ikonokat
+        /* Különben csak frissítjük az ikonokat */
         applyFilters();
     }
 }
 
-/**
- * A kedvencnek jelölt termékek kilistázása a wishlist.html-en.
- * Várunk, amíg a window.allProducts feltöltődik a common.js-ből.
- */
+
+ /* A kedvencnek jelölt termékek kilistázása a wishlist.html-en.
+ Várunk, amíg a window.allProducts feltöltődik a common.js-ből.*/
 function renderWishlist() {
     const container = document.getElementById("wishlist-list");
     if (!container) return;
 
     if (typeof window.allProducts === 'undefined' || window.allProducts.length === 0) {
-        // Ha még nem töltődtek be a termékek, próbáljuk újra 100ms múlva
+        /* Ha még nem töltődtek be a termékek, próbáljuk újra 100ms múlva */
         setTimeout(renderWishlist, 100);
         return;
     }
 
     let wishlistIds = JSON.parse(localStorage.getItem('wishlist')) || [];
     
-    // Robusztus szűrés: szöveggé alakítjuk az ID-kat az összehasonlításhoz (type mismatch elkerülése)
     const wishlistedProducts = window.allProducts.filter(p => 
         wishlistIds.some(id => String(id) === String(p.id))
     );
@@ -60,7 +55,7 @@ function renderWishlist() {
     }
 }
 
-// Oldal betöltésekor indítjuk a renderelést
+/* Oldal betöltésekor indítjuk a renderelést */
 if (window.location.pathname.includes('/wishlist')) {
     document.addEventListener('DOMContentLoaded', renderWishlist);
 }
