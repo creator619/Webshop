@@ -16,7 +16,7 @@ Ez egy komplett ruházati webáruház projekt, amely egy Node.js alapú backend 
 - **Backend**: Node.js, Express.js
 - **Adatbázis**: SQLite3 (helyi fájl alapú adatbázis)
 - **Hitelesítés**: JSON Web Token (JWT)
-- **Frontend**: HTML5, Vanilla CSS, Modern JavaScript
+- **Frontend**: HTML5, CSS, Modern JavaScript
 - **Biztonság**: Bcrypt (jelszó titkosítás), Express Rate Limit
 
 ## Telepítés és Futtatás
